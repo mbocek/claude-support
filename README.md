@@ -43,6 +43,8 @@ Specialized subagents invoked automatically by Claude Code based on context, or 
 | `go-test-automation` | Writes and improves Go tests — unit tests and integration tests with testcontainers. Prefers real containers over mocked repositories. |
 | `svelte-senior-developer` | Expert SvelteKit development — architecture, implementation, refactoring, debugging, and code review for Svelte/SvelteKit applications. |
 | `ux-senior-developer` | Front-end engineering combined with UX expertise — accessible and responsive UI components, interaction patterns, usability review, and design system alignment. |
+| `cloud-native-architect` | Designs and implements microservice architectures, distributed systems, and cloud-native applications — service boundaries, API contracts, resilience patterns, and observability strategies. |
+| `aws-infra-architect` | AWS infrastructure design, Terraform code, and cloud cost optimization — VPC design, service selection trade-offs, cost analysis, and production-readiness reviews. |
 
 ## Manual Installation
 
