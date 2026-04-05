@@ -32,6 +32,18 @@ Interactively scaffolds a new Go microservice as a subdirectory of the current p
 
 Scans the project root for subdirectories, creates missing `.iml` module files, registers them in `.idea/modules.xml`, and removes entries for directories that no longer exist.
 
+## Agents
+
+Specialized subagents invoked automatically by Claude Code based on context, or explicitly via `@agent-name`.
+
+| Agent | Description |
+|-------|-------------|
+| `go-senior-developer` | Expert Go development — new features, architecture, debugging, and technology decisions. Applies DDD, KISS, and idiomatic Go with zerolog, chi, pgx, eris, and testify. |
+| `go-code-reviewer` | Reviews Go code for correctness, idiomatic style, concurrency safety, performance, and test coverage. Triggered automatically after significant Go code is written or modified. |
+| `go-test-automation` | Writes and improves Go tests — unit tests and integration tests with testcontainers. Prefers real containers over mocked repositories. |
+| `svelte-senior-developer` | Expert SvelteKit development — architecture, implementation, refactoring, debugging, and code review for Svelte/SvelteKit applications. |
+| `ux-senior-developer` | Front-end engineering combined with UX expertise — accessible and responsive UI components, interaction patterns, usability review, and design system alignment. |
+
 ## Manual Installation
 
 If you prefer not to use the install script:
