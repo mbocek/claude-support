@@ -27,7 +27,8 @@ Based on the above changes, create a single git commit.
 
 1. Analyze the diff to determine the correct type and scope
 2. Write a concise commit message (1-2 lines) that focuses on the "why" not the "what"
-3. Stage the relevant files and create the commit in a single response
+3. **Show the proposed commit message to the user** and ask if they want to proceed, edit it, or cancel
+4. Wait for user confirmation — only then stage the relevant files and create the commit
 
 Use a HEREDOC for the commit message to preserve formatting:
 ```
@@ -39,4 +40,4 @@ EOF
 )"
 ```
 
-Do not use any other tools or do anything else. Do not send any other text or messages besides the tool calls.
+Do not use any other tools besides git commands and AskUserQuestion.
