@@ -8,7 +8,7 @@ description: >
   - user: "I need to add a POST /users endpoint that creates a new user in PostgreSQL"
   - user: "My goroutine is leaking and I can't figure out why"
   - user: "How should I structure this new service with DDD?"
-model: sonnet
+model: opus
 color: blue
 memory: project
 ---
