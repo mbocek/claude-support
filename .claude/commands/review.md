@@ -7,9 +7,9 @@ description: Review code changes using specialized agents
 
 - Arguments: $ARGUMENTS
 - Current branch: !`git branch --show-current`
-- Default branch: !`git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"`
+- Default branch: !`git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo "main"`
 - Git status: !`git status --short`
-- Commits ahead of default branch: !`git rev-list --count $(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")..HEAD 2>/dev/null || echo "0"`
+- Commits ahead of default branch: !`git rev-list --count origin/HEAD..HEAD 2>/dev/null || echo "0"`
 
 ## Your task
 
