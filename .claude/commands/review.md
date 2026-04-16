@@ -1,0 +1,126 @@
+---
+allowed-tools: Bash(git:*), Read, Grep, Glob, Agent
+description: Review code changes using specialized agents
+---
+
+## Context
+
+- Arguments: $ARGUMENTS
+- Current branch: !`git branch --show-current`
+- Default branch: !`git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main"`
+- Git status: !`git status --short`
+- Commits ahead of default branch: !`git rev-list --count $(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")..HEAD 2>/dev/null || echo "0"`
+
+## Your task
+
+Review code changes by dispatching specialized agents. Each agent reviews independently and produces its own report. **This is a read-only operation — no agent should modify any files.**
+
+### Step 1: Parse arguments and determine scope
+
+Parse `$ARGUMENTS` to determine **scope** and optional **path filter**.
+
+| Input | Scope | Path filter |
+|---|---|---|
+| *(empty)* | auto-detect: `branch` if commits ahead > 0, else `changes` | none |
+| `changes` | uncommitted changes (staged + unstaged) | none |
+| `branch` | full branch diff against default branch | none |
+| `<path>` (not `changes`/`branch`) | auto-detect | `<path>` |
+| `changes <path>` | uncommitted changes | `<path>` |
+| `branch <path>` | branch diff | `<path>` |
+
+### Step 2: Gather diff and changed files
+
+Run the appropriate git commands based on the resolved scope:
+
+- **changes** scope: `git diff HEAD [-- <path>]`
+- **branch** scope: `git diff <default-branch>...HEAD [-- <path>]`
+
+Get the list of changed files: add `--name-only` to the same diff command.
+
+Get the full diff content: the same diff command without `--name-only`.
+
+**If there are no changes, report that and stop.**
+
+### Step 3: Categorize changed files
+
+Assign each file to one or more categories:
+
+| Category | Matching patterns |
+|---|---|
+| **go-source** | `*.go` excluding `*_test.go` |
+| **go-tests** | `*_test.go` |
+| **frontend** | `*.svelte`, `*.ts`, `*.js`, `*.css`, `*.html` (excluding generated/bundled files) |
+| **infrastructure** | `*.tf`, `*.tfvars`, `Dockerfile*`, `docker-compose*` |
+
+Additionally, flag these **cross-cutting concerns** (checked against go-source and infrastructure changes):
+
+- **architecture-review**: new Go packages/modules, new or changed domain types (aggregates, repositories, value objects), changed public interfaces, changes spanning 3+ packages, new service directories
+- **ddd-review**: any changes to domain layer code, new bounded contexts, changed aggregate boundaries, repository interface changes
+- **cloud-review**: changes to service-to-service communication, API contracts (proto, OpenAPI), resilience patterns, observability, data consistency mechanisms
+
+### Step 4: Dispatch agents in parallel
+
+For each category that has changes, construct a prompt and spawn the agent using the `Agent` tool. **Send ALL Agent calls in a single message so they run concurrently.**
+
+Every agent prompt must:
+1. State clearly this is a **code review** — read-only, no modifications
+2. Include the full diff for the files relevant to that agent
+3. List the changed files
+4. Instruct the agent to read full current files when broader context is needed
+
+#### Agent dispatch table
+
+| Condition | `subagent_type` | Review focus |
+|---|---|---|
+| **go-source** has files | `go-code-reviewer` | Correctness, performance, concurrency safety, idiomatic Go, error handling. Also assess test coverage for the changed code. |
+| **go-source** has files AND (**ddd-review** or **architecture-review** flagged) | `go-senior-developer` | DDD alignment, architectural decisions, domain modeling, package structure, design patterns. Do NOT duplicate what go-code-reviewer covers — focus on the higher-level design. |
+| **go-tests** has files | `go-test-automation` | Test quality, table-driven patterns, testcontainers usage, assertion quality, missing edge cases. Suggest concrete additional test cases. |
+| **frontend** has files | `svelte-senior-developer` | SvelteKit patterns, reactivity, SSR/CSR, load functions, component design, TypeScript usage. |
+| **frontend** has UI component files | `ux-senior-developer` | Accessibility (WCAG 2.2 AA), interaction patterns, responsive design, UX best practices. |
+| **infrastructure** has files | `aws-infra-architect` | Terraform quality, cost implications, security, resource sizing, best practices. |
+| **cloud-review** flagged | `cloud-native-architect` | Service boundaries, resilience patterns, data consistency, API contract design, observability. |
+
+**Only spawn agents for conditions that are met.** Never spawn an agent with an empty diff.
+
+#### Prompt template for each agent
+
+Use this structure when constructing each Agent prompt:
+
+```
+You are reviewing code changes. This is a READ-ONLY review — do not create, edit, or write any files.
+
+## Review scope
+- Scope: {changes|branch} review
+- Branch: {current branch}
+- Base: {default branch}
+
+## Changed files (your area)
+{list of files}
+
+## Diff
+```diff
+{the diff content for these files only}
+```
+
+## Instructions
+Read the full current version of the changed files for context. Then perform your review focusing on: {focus area from the table above}.
+
+Structure your review with clear severity levels (Critical > Important > Minor).
+```
+
+### Step 5: Present results
+
+As each agent completes, output its review in its own section. **Do not summarize, aggregate, or cross-reference between agents.** Each review stands alone.
+
+Format:
+
+```
+---
+
+## Review: {Agent Name}
+**Scope**: {list of reviewed files or area}
+
+{full agent review output — do not truncate}
+```
+
+After all agents finish, add a brief closing line listing which agents participated and how many issues each found at each severity level.
