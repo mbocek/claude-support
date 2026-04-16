@@ -110,17 +110,55 @@ Structure your review with clear severity levels (Critical > Important > Minor).
 
 ### Step 5: Present results
 
-As each agent completes, output its review in its own section. **Do not summarize, aggregate, or cross-reference between agents.** Each review stands alone.
+After all agents complete, collect every issue they reported and assign each a short ID (e.g. `C1`, `C2` for Critical; `I1`, `I2` for Important; `M1`, `M2` for Minor). Then present results in **two parts**: a priority-grouped summary table, followed by the detail for each issue.
 
-Format:
+#### Part A — Summary table (grouped by priority)
+
+Render one table per severity level in this order: **Critical → Important → Minor**. Skip a level entirely if it has no issues. Each row is one issue:
+
+```
+## Critical
+
+| ID | Agent | File | Summary |
+|---|---|---|---|
+| C1 | {agent name} | {file:line} | {one-line description} |
+
+## Important
+
+| ID | Agent | File | Summary |
+|---|---|---|---|
+| I1 | {agent name} | {file:line} | {one-line description} |
+
+## Minor
+
+| ID | Agent | File | Summary |
+|---|---|---|---|
+| M1 | {agent name} | {file:line} | {one-line description} |
+```
+
+Keep the `Summary` column to a single short line so the table stays readable. Use `file:line` when the agent pointed to a specific location, otherwise just the file path or `—`.
+
+#### Part B — Issue details
+
+Below the tables, output full detail for every issue in the same order as the tables (Critical first, then Important, then Minor). Use the ID as the heading so rows in Part A link mentally to the detail in Part B:
 
 ```
 ---
 
-## Review: {Agent Name}
-**Scope**: {list of reviewed files or area}
+## Details
 
-{full agent review output — do not truncate}
+### C1 — {one-line summary}
+**Agent**: {agent name}
+**File**: {file:line}
+
+{full explanation from the agent — problem, why it matters, suggested fix. Do not truncate.}
+
+### C2 — {one-line summary}
+...
 ```
 
-After all agents finish, add a brief closing line listing which agents participated and how many issues each found at each severity level.
+**Do not summarize, aggregate, or cross-reference between agents in the detail section** — each issue's detail is the agent's own words.
+
+After the details, add a brief closing line listing which agents participated and the issue counts per severity (e.g. `go-code-reviewer: 1 Critical, 2 Important, 0 Minor`).
+
+**If no agent reported any issues**, skip the tables and details and output a single line confirming the review found nothing.
