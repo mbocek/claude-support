@@ -1,21 +1,22 @@
 ---
-allowed-tools: Bash(ls:*), Read, Write
+allowed-tools: Bash(ls:*), Bash(pwd), Read, Write, Glob
 description: Sync IntelliJ IDEA modules.xml with project subdirectories
 ---
 
 ## Context
 
-- Project root: !`pwd`
-- Existing modules.xml: !`cat .idea/modules.xml 2>/dev/null || echo "not found"`
-- Subdirectories with code: !`ls -d */ | grep -v -E '^\.(idea|claude|git)|^artifacts|^scratchpad' | sed 's/\/$//'`
-- Go modules (have go.mod): !`ls */go.mod 2>/dev/null | sed 's#/go.mod$##' || echo "(none)"`
+- Current working directory: !`pwd`
 
 ## Your task
 
-Scan the project root for subdirectories that should be IntelliJ modules (skip `.idea`, `.claude`, `.git`, `artifacts`, `scratchpad`). For each directory, ensure:
-
-1. A `.iml` module file exists in `.idea/<dir-name>.iml` — create if missing
-2. The module is registered in `.idea/modules.xml`
+1. **Locate the IntelliJ project root.** Starting from the working directory, walk up the tree until a directory contains a `.idea/` subdirectory. Use the Glob tool with `pattern=".idea/modules.xml"` (or `".idea"` wildcard) and `path=<candidate>` — or `Bash: ls <candidate>/.idea` — to test. If no `.idea/` is found before you reach `$HOME` or `/`, stop and print a short message telling the user to run from the IntelliJ project root. Do not create any files.
+2. From the project root:
+   - Read `.idea/modules.xml` with the Read tool (treat as "not found" if it doesn't exist).
+   - List immediate subdirectories with `Bash: ls -d <root>/*/`.
+   - Find Go modules with the Glob tool: `pattern="*/go.mod"`, `path=<root>`. Each match `<dir>/go.mod` means `<dir>` is a Go module.
+3. Scan the subdirectories for candidate IntelliJ modules (skip `.idea`, `.claude`, `.git`, `artifacts`, `scratchpad`, and any other dotfile directories). For each kept directory, ensure:
+   - `<root>/.idea/<dir-name>.iml` exists AND contains a `<component name="NewModuleRootManager">` with `<content url="file://$MODULE_DIR$/<dir-name>">`. If missing OR the content is wrong (e.g., stub with only `AdditionalModuleElements`, missing `NewModuleRootManager`, wrong path), overwrite it with the template below.
+   - The module is registered in `<root>/.idea/modules.xml`
 
 Pick the template based on whether `<dir-name>/go.mod` exists.
 
