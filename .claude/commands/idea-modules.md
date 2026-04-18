@@ -8,7 +8,7 @@ description: Sync IntelliJ IDEA modules.xml with project subdirectories
 - Project root: !`pwd`
 - Existing modules.xml: !`cat .idea/modules.xml 2>/dev/null || echo "not found"`
 - Subdirectories with code: !`ls -d */ | grep -v -E '^\.(idea|claude|git)|^artifacts|^scratchpad' | sed 's/\/$//'`
-- Go modules (have go.mod): !`ls */go.mod 2>/dev/null | sed 's|/go.mod$||' || echo "(none)"`
+- Go modules (have go.mod): !`ls */go.mod 2>/dev/null | sed 's#/go.mod$##' || echo "(none)"`
 
 ## Your task
 
