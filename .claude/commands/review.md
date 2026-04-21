@@ -1,19 +1,24 @@
 ---
-allowed-tools: Bash(git:*), Read, Grep, Glob, Agent
-description: Review code changes using specialized agents
+allowed-tools: Bash(git:*), Bash(find:*), Bash(pwd:*), Read, Grep, Glob, Agent
+description: Review code changes or a directory tree using specialized agents
 ---
 
 ## Context
 
 - Arguments: $ARGUMENTS
-- Current branch: !`git branch --show-current`
+- Current branch: !`git branch --show-current 2>/dev/null || echo "(not a git repo)"`
 - Default branch: !`git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo "main"`
-- Git status: !`git status --short`
+- Git status: !`git status --short 2>/dev/null || echo "(not a git repo)"`
 - Commits ahead of default branch: !`git rev-list --count origin/HEAD..HEAD 2>/dev/null || echo "0"`
+- Working directory: !`pwd`
 
 ## Your task
 
-Review code changes by dispatching specialized agents. Each agent reviews independently and produces its own report. **This is a read-only operation — no agent should modify any files.**
+Review code by dispatching specialized agents. Each agent reviews independently and produces its own report. **This is a read-only operation — no agent should modify any files.**
+
+Two review modes are supported:
+- **Diff-based review** (`changes`, `branch`) — agents review a git diff
+- **Tree-based review** (`tree`) — agents review all source files under a directory (full code review, not diff-based)
 
 ### Step 1: Parse arguments and determine scope
 
@@ -24,22 +29,36 @@ Parse `$ARGUMENTS` to determine **scope** and optional **path filter**.
 | *(empty)* | auto-detect: `branch` if commits ahead > 0, else `changes` | none |
 | `changes` | uncommitted changes (staged + unstaged) | none |
 | `branch` | full branch diff against default branch | none |
-| `<path>` (not `changes`/`branch`) | auto-detect | `<path>` |
+| `tree` | full code review of current directory recursively | `.` |
+| `tree <path>` | full code review of `<path>` recursively | `<path>` |
+| `.` | shortcut for `tree .` | `.` |
+| `<path>` (not a scope keyword) | auto-detect: `tree` if path is a directory that exists, else diff-based with path filter | `<path>` |
 | `changes <path>` | uncommitted changes | `<path>` |
 | `branch <path>` | branch diff | `<path>` |
 
-### Step 2: Gather diff and changed files
+Scope keywords are: `changes`, `branch`, `tree`.
 
-Run the appropriate git commands based on the resolved scope:
+### Step 2: Gather files to review
 
-- **changes** scope: `git diff HEAD [-- <path>]`
-- **branch** scope: `git diff <default-branch>...HEAD [-- <path>]`
+**For diff-based scopes (`changes`, `branch`):**
+
+- **changes**: `git diff HEAD [-- <path>]`
+- **branch**: `git diff <default-branch>...HEAD [-- <path>]`
 
 Get the list of changed files: add `--name-only` to the same diff command.
-
 Get the full diff content: the same diff command without `--name-only`.
 
 **If there are no changes, report that and stop.**
+
+**For tree-based scope (`tree`):**
+
+Collect the list of files under `<path>` (defaulting to `.` if none given):
+- If inside a git repo: `git ls-files -- <path>` (respects `.gitignore` and shows tracked files).
+- If not a git repo or user needs untracked files too: `find <path> -type f`, excluding common noise (`.git`, `node_modules`, `dist`, `build`, `.svelte-kit`, `.next`, `target`, `vendor`, `coverage`, `*.min.*`, lockfiles).
+
+No diff is produced for `tree` scope — agents read full file contents instead.
+
+**If the path does not exist or contains no relevant source files, report that and stop.**
 
 ### Step 3: Categorize changed files
 
@@ -60,13 +79,14 @@ Additionally, flag these **cross-cutting concerns** (checked against go-source a
 
 ### Step 4: Dispatch agents in parallel
 
-For each category that has changes, construct a prompt and spawn the agent using the `Agent` tool. **Send ALL Agent calls in a single message so they run concurrently.**
+For each category that has files, construct a prompt and spawn the agent using the `Agent` tool. **Send ALL Agent calls in a single message so they run concurrently.**
 
 Every agent prompt must:
 1. State clearly this is a **code review** — read-only, no modifications
-2. Include the full diff for the files relevant to that agent
-3. List the changed files
-4. Instruct the agent to read full current files when broader context is needed
+2. For diff-based scopes: include the full diff for the files relevant to that agent
+3. For tree-based scope: include the list of files relevant to that agent and instruct the agent to read each one in full
+4. List the files in the agent's area
+5. Instruct the agent to read full current files when broader context is needed
 
 #### Agent dispatch table
 
@@ -80,11 +100,9 @@ Every agent prompt must:
 | **infrastructure** has files | `aws-infra-architect` | Terraform quality, cost implications, security, resource sizing, best practices. |
 | **cloud-review** flagged | `cloud-native-architect` | Service boundaries, resilience patterns, data consistency, API contract design, observability. |
 
-**Only spawn agents for conditions that are met.** Never spawn an agent with an empty diff.
+**Only spawn agents for conditions that are met.** Never spawn an agent with an empty file list.
 
-#### Prompt template for each agent
-
-Use this structure when constructing each Agent prompt:
+#### Prompt template — diff-based scopes (`changes`, `branch`)
 
 ```
 You are reviewing code changes. This is a READ-ONLY review — do not create, edit, or write any files.
@@ -106,6 +124,25 @@ You are reviewing code changes. This is a READ-ONLY review — do not create, ed
 Read the full current version of the changed files for context. Then perform your review focusing on: {focus area from the table above}.
 
 Structure your review with clear severity levels (Critical > Important > Minor).
+```
+
+#### Prompt template — tree-based scope (`tree`)
+
+```
+You are performing a full code review of existing source files. This is a READ-ONLY review — do not create, edit, or write any files.
+
+## Review scope
+- Scope: tree review (full code review, not diff-based)
+- Path: {path or "."}
+- Working directory: {pwd}
+
+## Files to review (your area)
+{list of files}
+
+## Instructions
+Read each listed file in full using the Read tool. You are reviewing the current state of the code, not a diff. Follow cross-file references as needed to understand context. Then perform your review focusing on: {focus area from the table above}.
+
+Structure your review with clear severity levels (Critical > Important > Minor). Cite findings as `file:line` so they can be located quickly.
 ```
 
 ### Step 5: Present results
