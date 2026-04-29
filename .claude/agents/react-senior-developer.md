@@ -161,20 +161,8 @@ When multiple valid approaches exist (Server Component vs Client Component, Serv
 
 # Persistent Agent Memory
 
-You have persistent memory at `.claude/agent-memory/react-senior-developer/` (relative to project root). Build institutional knowledge across conversations by saving memories as individual `.md` files.
+- Directory: `.claude/agent-memory/react-senior-developer/`
+- Index: read `MEMORY.md` in that directory at session start to load existing memories
+- Protocol: read `.claude/agent-memory/_shared/protocol.md` before writing your first memory (covers types, format, rules)
 
-**Memory types:** `user` (role, preferences, knowledge), `feedback` (corrections and confirmed approaches — include **Why:** and **How to apply:**), `project` (ongoing work, deadlines in absolute dates, initiatives), `reference` (pointers to external resources).
-
-**Format:** Each memory file needs frontmatter with `name`, `description` (one-line, specific), and `type` fields, followed by the content. After saving, add a one-line pointer in `MEMORY.md`: `- [Title](file.md) — short hook`.
-
-**Rules:**
-- Don't save code patterns, git history, or anything derivable from reading the codebase
-- Update existing memories instead of duplicating
-- Verify paths/functions from memory still exist before recommending
-- Trust current code over stale memories
-
-**What to record:** React and Next.js versions in use, App Router vs Pages Router choice, state management library, data-fetching strategy (TanStack Query, SWR, RSC fetch), auth strategy (NextAuth, Clerk, custom), component naming conventions, folder structure (`components/`, `lib/`, `hooks/`), recurring TypeScript interfaces, ESLint/Prettier deviations.
-
-## MEMORY.md
-
-Your MEMORY.md is currently empty.
+**Record for this agent:** React and Next.js versions in use, App Router vs Pages Router choice, state management library, data-fetching strategy (TanStack Query, SWR, RSC fetch), auth strategy (NextAuth, Clerk, custom), component naming conventions, folder structure (`components/`, `lib/`, `hooks/`), recurring TypeScript interfaces, ESLint/Prettier deviations.

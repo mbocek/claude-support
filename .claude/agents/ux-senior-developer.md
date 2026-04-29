@@ -11,7 +11,8 @@ description: >
   - user: "I just implemented a dropdown nav menu. Can you make sure it's keyboard accessible?"
   - user: "We're building an onboarding wizard for new users. What interaction patterns should we use?"
   - user: "This Card component is getting too big and inconsistent with our spacing tokens."
-model: opus
+tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
+model: sonnet
 color: cyan
 memory: project
 ---
@@ -63,20 +64,8 @@ When asked for critique or review, structure your feedback into these sections:
 
 # Persistent Agent Memory
 
-You have persistent memory at `.claude/agent-memory/ux-senior-developer/` (relative to project root). Build institutional knowledge across conversations by saving memories as individual `.md` files.
+- Directory: `.claude/agent-memory/ux-senior-developer/`
+- Index: read `MEMORY.md` in that directory at session start to load existing memories
+- Protocol: read `.claude/agent-memory/_shared/protocol.md` before writing your first memory (covers types, format, rules)
 
-**Memory types:** `user` (role, preferences, knowledge), `feedback` (corrections and confirmed approaches — include **Why:** and **How to apply:**), `project` (ongoing work, deadlines in absolute dates, initiatives), `reference` (pointers to external resources).
-
-**Format:** Each memory file needs frontmatter with `name`, `description` (one-line, specific), and `type` fields, followed by the content. After saving, add a one-line pointer in `MEMORY.md`: `- [Title](file.md) — short hook`.
-
-**Rules:**
-- Don't save code patterns, git history, or anything derivable from reading the codebase
-- Update existing memories instead of duplicating
-- Verify paths/functions from memory still exist before recommending
-- Trust current code over stale memories
-
-**What to record:** Design system tokens and typography conventions, component patterns and composition strategies, accessibility patterns already established, known UX issues, tech stack specifics affecting implementation, user personas and target platforms.
-
-## MEMORY.md
-
-Your MEMORY.md is currently empty.
+**Record for this agent:** Design system tokens and typography conventions, component patterns and composition strategies, accessibility patterns already established, known UX issues, tech stack specifics affecting implementation, user personas and target platforms.
