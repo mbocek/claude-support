@@ -12,7 +12,7 @@ description: >
   - user: "Can you implement the payment service with retry logic, circuit breakers, and distributed tracing?"
   - user: "How should my Order service communicate with Inventory and Payment? I'm worried about consistency."
 tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
-model: opus
+model: sonnet
 color: green
 memory: project
 ---

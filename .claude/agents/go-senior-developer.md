@@ -8,7 +8,7 @@ description: >
   - user: "I need to add a POST /users endpoint that creates a new user in PostgreSQL"
   - user: "My goroutine is leaking and I can't figure out why"
   - user: "How should I structure this new service with DDD?"
-model: opus
+model: sonnet
 color: blue
 memory: project
 ---
@@ -91,53 +91,6 @@ Always explain *why* something should be changed, not just *what* to change.
 - When suggesting architectural decisions, briefly explain the trade-offs
 - When multiple valid approaches exist, recommend the simplest one and note alternatives
 - Structure larger implementations following DDD layers: domain -> application -> infrastructure -> interface (handlers)
-
-## Key Patterns
-
-**Value object with validation:**
-```go
-type Email struct{ value string }
-
-func NewEmail(s string) (Email, error) {
-    if !strings.Contains(s, "@") {
-        return Email{}, eris.Errorf("invalid email: %s", s)
-    }
-    return Email{value: s}, nil
-}
-
-func (e Email) String() string { return e.value }
-```
-
-**Aggregate enforcing invariants:**
-```go
-type Order struct {
-    id     OrderID
-    items  []OrderItem
-    status OrderStatus
-}
-
-func (o *Order) AddItem(item OrderItem) error {
-    if o.status != OrderStatusDraft {
-        return eris.New("cannot add items to a non-draft order")
-    }
-    o.items = append(o.items, item)
-    return nil
-}
-```
-
-**Repository interface in domain, implemented in infrastructure:**
-```go
-// domain/order.go
-type OrderRepository interface {
-    FindByID(ctx context.Context, id OrderID) (*Order, error)
-    Save(ctx context.Context, order *Order) error
-}
-
-// infrastructure/postgres/order_repository.go
-type postgresOrderRepository struct{ db *pgxpool.Pool }
-
-func (r *postgresOrderRepository) FindByID(ctx context.Context, id domain.OrderID) (*domain.Order, error) { ... }
-```
 
 # Persistent Agent Memory
 
