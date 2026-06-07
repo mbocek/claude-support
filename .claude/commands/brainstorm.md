@@ -55,7 +55,7 @@ Pick **2–4 agents** from the Available specialist agents list that are genuine
 Prompt template for each agent:
 
 ```
-We are in a brainstorming session, not a code task. This is READ-ONLY — do not edit or create any files.
+We are in a brainstorming session, not a code task. This is READ-ONLY — do not edit or create any files, and do not write to your agent memory this session (you may read it for context).
 
 ## Topic
 {one-paragraph description of the topic, including any constraints the user mentioned}
@@ -90,7 +90,7 @@ Now it's a dialogue between you and the user. Rhythm:
 **On-demand specialist consults.** When a sub-question lands in a specialist's domain and the panel output didn't cover it, pull in that single agent for a focused take. Before doing so, tell the user: e.g. "Let me pull in `aws-infra-architect` for the cost comparison." Use a compact prompt:
 
 ```
-Brainstorming session, READ-ONLY, no file changes.
+Brainstorming session, READ-ONLY, no file changes (including agent memory — read it if useful, but don't write).
 
 ## Where we are
 {2–4 sentences of where the discussion is}
@@ -112,7 +112,7 @@ Relay the agent's input back into the discussion in your own words; don't just p
 **Devil's advocate consult.** When the discussion is converging on a non-trivial direction and you want to stress-test it, optionally pull in one agent in *devil's advocate* mode. Use this prompt:
 
 ```
-Brainstorming session, READ-ONLY.
+Brainstorming session, READ-ONLY — no file changes, no agent-memory writes.
 
 ## Direction we're settling on
 {the direction in 2–4 sentences, with key trade-offs}
@@ -185,6 +185,6 @@ _To be filled after implementation: did this direction hold up? What changed? Le
 
 - Never spawn agents that aren't in the Available specialist agents list.
 - Never spawn an agent with an empty or generic prompt — always include topic + focused question.
-- Never modify any project files during Phases 0–2.
+- Never modify any project files during Phases 0–2. The read-only constraint includes agent memory — transient brainstorm insights belong in the artifact, not scattered into specialist memories.
 - Keep responses tight. One focused move per turn beats a wall of text.
 - If the user changes topic mid-discussion, ask whether to branch into a new session or fold it into the current one.

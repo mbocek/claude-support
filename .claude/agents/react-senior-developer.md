@@ -9,6 +9,7 @@ description: >
   - user: "My state isn't updating the UI when it changes inside an async callback"
   - user: "This page.tsx file is 400 lines and does too much. Can you help me split it up?"
   - user: "What's the best way to protect routes and handle session state in Next.js?"
+tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
 model: sonnet
 color: cyan
 memory: project
