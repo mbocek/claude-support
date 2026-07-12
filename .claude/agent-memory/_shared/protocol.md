@@ -1,6 +1,8 @@
 # Agent Memory Protocol
 
-Shared memory protocol used by all agents in this project. Each agent has its own memory directory at `.claude/agent-memory/<agent-name>/` and follows the rules below.
+Shared memory protocol for agents with `memory: project` enabled. Each such agent has its own memory directory at `.claude/agent-memory/<agent-name>/` and follows the rules below.
+
+**Scope of the write grant:** enabling memory grants the agent Write/Edit tools even when its role is otherwise read-only. That grant exists *solely* for the memory directory — an agent whose prompt declares it read-only must never write outside `.claude/agent-memory/<agent-name>/`.
 
 ## Memory types
 
@@ -25,9 +27,10 @@ Each memory is its own `.md` file with frontmatter:
 
 ```markdown
 ---
-name: {{short title}}
+name: {{short-kebab-case-slug}}
 description: {{one-line, specific — used to decide relevance later}}
-type: {{user|feedback|project|reference}}
+metadata:
+  type: {{user|feedback|project|reference}}
 ---
 
 {{body — for feedback/project, structure as: rule/fact, then **Why:** and **How to apply:** lines}}
@@ -36,7 +39,7 @@ type: {{user|feedback|project|reference}}
 After saving, add a one-line pointer in `MEMORY.md`:
 `- [Title](file.md) — short hook`
 
-`MEMORY.md` is the index, not a memory. No frontmatter. Keep entries under ~150 chars each — content past line ~150 of MEMORY.md may be truncated when loaded into agent context.
+`MEMORY.md` is the index, not a memory. No frontmatter. Keep entries to one short line each — content past line ~200 of MEMORY.md may be truncated when loaded into agent context.
 
 ## Rules
 

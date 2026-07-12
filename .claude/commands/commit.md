@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git diff:*), Bash(git log:*)
+allowed-tools: Bash(git:*), Bash(cat:*), Bash(echo:*), AskUserQuestion
 description: Create a git commit following project conventions
 ---
 

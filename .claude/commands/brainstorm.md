@@ -1,5 +1,5 @@
 ---
-allowed-tools: Agent, Read, Write, Grep, Glob, Bash(ls:*), Bash(date:*), Bash(pwd)
+allowed-tools: Agent, Read, Write, Grep, Glob, Bash(date:*), Bash(pwd)
 argument-hint: [topic]
 description: Brainstorm a topic as a sparring partner, with the agent panel on call — feeds /feature
 ---

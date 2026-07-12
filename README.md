@@ -22,6 +22,8 @@ curl -fsSL https://raw.githubusercontent.com/mbocek/claude-support/main/install.
 
 This downloads the `.claude` directory into your current working directory. Requires `curl` and `jq`. After installing into a new project, run `/bootstrap-project` to set up the `CLAUDE.md` contract the agents rely on.
 
+> **Note:** re-running the installer overwrites the distributed files (agents, commands, templates) with the repo versions — local edits to those files are lost. Your own files, including saved agent memories under `.claude/agent-memory/<agent>/`, are untouched.
+
 ## Agents
 
 | Agent | Model / effort | Access | Role |
@@ -53,7 +55,9 @@ Agents are generic; projects are not. Each project's `CLAUDE.md` supplies what t
 
 ## Agent memory
 
-Agents with `memory: project` persist durable, non-obvious findings under `.claude/agent-memory/<agent-name>/` following the shared protocol in [`.claude/agent-memory/_shared/protocol.md`](.claude/agent-memory/_shared/protocol.md) — expensive insights (a debugger root cause, a consultant verdict) shouldn't need to be bought twice.
+Agents with `memory: project` persist durable, non-obvious findings under `.claude/agent-memory/<agent-name>/`, complementing the built-in memory instructions with the house rules in [`.claude/agent-memory/_shared/protocol.md`](.claude/agent-memory/_shared/protocol.md) — expensive insights (a debugger root cause, a consultant verdict) shouldn't need to be bought twice.
+
+One consequence to know: enabling memory grants an agent Write/Edit tools even when its role is read-only. The "read-only" in the agents table is therefore enforced by each agent's prompt (which restricts writes to its memory directory), not by the tool allowlist alone.
 
 ## Manual Installation
 

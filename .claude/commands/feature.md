@@ -23,6 +23,7 @@ If `$ARGUMENTS` names a `brainstorm-*.md` file (or one in the working directory 
 - **Core direction and Assumptions are decided.** Pass them to the architect as givens; do not re-litigate them. If the architect finds a decided item untenable against the real code, that goes back to the user, not into silent redesign.
 - **Open questions are genuinely open.** The architect must settle each one explicitly in the plan or surface it at the approval gate — never resolve one silently.
 - Carry the artifact's risks into the plan's risk section so mitigations become steps, not prose.
+- **Map-mode artifact** (has `## Variants explored` instead of `## Core direction`): the "what" is not decided yet, so do not start the pipeline. Summarize the variants and use AskUserQuestion to have the user pick one (or send them back to `/brainstorm` / `/consult` to converge). Only after a variant is chosen does it become the core direction and the pipeline proceeds.
 
 ### Phase 1 — Recon (scout)
 

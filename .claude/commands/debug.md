@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git:*), Bash(pwd:*), Bash(echo:*), Read, Grep, Glob, Agent, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(echo:*), Read, Grep, Glob, Agent, AskUserQuestion
 description: Structured debugging — reproduce → hypothesize → bisect → root cause → optional fix
 ---
 
