@@ -46,7 +46,6 @@ This downloads the `.claude` directory into your current working directory. Requ
 | `/consult` | Escalation to `fable-consultant` with an enforced briefing protocol (problem, attempts, constraints, the question) and a gate against casual use |
 | `/bootstrap-project` | Audits or creates the project's `CLAUDE.md` against the contract template — the glue between generic agents and a concrete stack |
 | `/commit` | Create a git commit following [commitizen](https://commitizen-tools.github.io/commitizen/) conventions (`<type>(<scope>): <description>`) |
-| `/idea-modules` | Sync IntelliJ IDEA `modules.xml` with project subdirectories |
 
 ## The CLAUDE.md contract
 
