@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git:*), Read, Grep, Glob, Agent, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(echo:*), Read, Grep, Glob, Agent, AskUserQuestion
 description: Escalate a hard problem to the fable-consultant with a properly packaged briefing
 ---
 

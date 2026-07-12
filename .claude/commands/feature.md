@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git:*), Bash(pwd:*), Read, Grep, Glob, Agent, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(pwd:*), Bash(echo:*), Read, Grep, Glob, Agent, AskUserQuestion
 description: End-to-end feature pipeline — scout → architect → approval → implementer → tests → review loop
 ---
 
