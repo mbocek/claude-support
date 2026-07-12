@@ -16,13 +16,21 @@ Drive a feature from request to reviewed implementation using the agent pipeline
 
 If `$ARGUMENTS` is empty, ask the user what to build before doing anything else.
 
+### Phase 0 — Brainstorm handoff (when applicable)
+
+If `$ARGUMENTS` names a `brainstorm-*.md` file (or one in the working directory clearly matches the request), read it first — it is the decision record from `/brainstorm`. Contract for using it:
+
+- **Core direction and Assumptions are decided.** Pass them to the architect as givens; do not re-litigate them. If the architect finds a decided item untenable against the real code, that goes back to the user, not into silent redesign.
+- **Open questions are genuinely open.** The architect must settle each one explicitly in the plan or surface it at the approval gate — never resolve one silently.
+- Carry the artifact's risks into the plan's risk section so mitigations become steps, not prose.
+
 ### Phase 1 — Recon (scout)
 
 Dispatch **scout** with the feature request and ask for: the parts of the codebase the feature touches, existing analogous implementations, relevant conventions, and gaps. Skip this phase only when the change is trivially localized and you already know the target files.
 
 ### Phase 2 — Plan (architect)
 
-Dispatch **architect** with the feature request plus the scout report. Require the standard plan output (goal, design, ordered steps, risks, verification).
+Dispatch **architect** with the feature request, the scout report, and — when present — the brainstorm artifact contract from Phase 0. Require the standard plan output (goal, design, ordered steps, risks, verification).
 
 **Decision gate:** present the plan to the user — goal, design summary, steps, and especially risks/open questions. Use AskUserQuestion when the plan contains a genuine either-or the user must decide. Do not proceed to implementation until the user approves the plan or amends it. If the working tree is dirty, point that out here so the user can decide whether to commit/stash first.
 
