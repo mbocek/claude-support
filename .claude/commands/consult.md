@@ -27,7 +27,7 @@ Never route *security review of code* here — that is security-reviewer's job (
 
 ### Step 2 — Package the briefing
 
-Assemble from the session (and by reading the repo where needed) a briefing with exactly these sections. If you cannot fill one, gather the missing information first — do not send a hollow briefing.
+Assemble from the session (and by reading the repo where needed) a briefing with exactly these sections. If you cannot fill one, gather the missing information first — do not send a hollow briefing. The gaps are usually independent: fill them with parallel tool calls in one message (read the files, grep the symbols, pull the logs at once), or one batched scout dispatch when the sweep is broad — never gather section by section.
 
 1. **Problem** — what is wrong or what must be decided, with the observable facts (error output, measurements, requirements) verbatim, not paraphrased.
 2. **Attempts / options** — each approach already tried or on the table, what it showed or costs, and why it was insufficient. This tells the consultant which paths are dead.

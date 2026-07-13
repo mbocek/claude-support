@@ -23,10 +23,12 @@ checklist.
 
 ### Step 1 — Discover the project
 
-Dispatch **scout** to establish the facts the file needs: languages and frameworks in use, how the
-repo is laid out, how it is built/tested/linted/run (Makefile, package.json scripts, CI config are
-the best sources), what is generated code, and any existing docs stating conventions. Every command
-scout reports must be traceable to a definition in the repo (Makefile target, script entry, CI step)
+Dispatch **scout** to establish the facts the file needs — as parallel scouts in a single message,
+one per independent question: (a) languages, frameworks, and repo layout; (b) build/test/lint/run
+commands (Makefile, package.json scripts, CI config are the best sources); (c) conventions,
+boundaries, generated code, and existing docs stating rules. For a small repo a single scout
+covering all three is fine — but never run them one after another. Every command scout reports must
+be traceable to a definition in the repo (Makefile target, script entry, CI step)
 — a `CLAUDE.md` with an invented test command poisons every future agent run.
 
 **If discovery comes back nearly empty** — no build system, no source code, or a project type scout
@@ -37,9 +39,10 @@ missing facts; a `CLAUDE.md` containing only the sections the user confirmed is 
 
 **If `CLAUDE.md` exists:** compare it against the template's sections and the scout's findings.
 Produce a gap report: missing sections, stale or wrong claims, and content that belongs elsewhere
-(long prose, duplicated README material). For suspicious commands, dispatch **scout** to confirm
-each is still defined in the repo's build config — do not attempt to execute project build/test
-commands yourself; existence in the config is the verification bar here. Propose concrete edits.
+(long prose, duplicated README material). For suspicious commands, dispatch one **scout** with the
+full list to confirm each is still defined in the repo's build config — a single batched run, not
+one dispatch per command; do not attempt to execute project build/test commands yourself; existence
+in the config is the verification bar here. Propose concrete edits.
 
 **If it is missing:** draft it from the template, filled with the discovered facts. Where discovery
 could not answer something an agent will need — conventions that aren't visible in code,

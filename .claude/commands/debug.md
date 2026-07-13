@@ -18,7 +18,7 @@ If `$ARGUMENTS` is empty, ask the user for: the observed behavior, the expected 
 
 ### Step 1 — Collect the evidence
 
-Gather what exists before dispatching: error output, failing test names, logs, the suspected timeframe ("started after Friday's deploy" → candidate commit range from `git log`). Ask the user for artifacts they mentioned but didn't paste. Evidence collected here saves the expensive agent's tokens.
+Gather what exists before dispatching: error output, failing test names, logs, the suspected timeframe ("started after Friday's deploy" → candidate commit range from `git log`). The evidence sources are independent — collect them with parallel tool calls in a single message (git log + grep for the failing test + read the log file at once), not one by one. Ask the user for artifacts they mentioned but didn't paste. Evidence collected here saves the expensive agent's tokens.
 
 ### Step 2 — Dispatch the debugger (diagnosis only)
 

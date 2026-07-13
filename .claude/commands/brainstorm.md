@@ -42,7 +42,7 @@ Announce each phase transition with a one-line marker — e.g. *"→ Phase 1: sp
 2. **Scope check.** Brainstorm fits open-ended design questions, trade-off explorations, early-stage ideation — the phase *before* the "what" is decided. It is the wrong tool for: factual lookups, well-defined build tasks (`/feature`), debugging (`/debug`). If the topic isn't brainstorm-shaped, name the better path and ask whether to continue anyway.
 3. Restate the topic in one sentence as you understand it, and flag any ambiguity. Ask **1–3 clarifying questions** if scope or constraints are unclear — only ones that genuinely change direction (timeline, scale, audience, hard constraints). Don't interrogate.
 4. **Mode.** Ask whether the goal is to **converge** on a single direction or to **map the space** with several alternatives held open. Default to converge if the user doesn't specify. The mode affects Phase 2 dynamics and the artifact shape.
-5. **Ground truth.** If the topic touches the existing codebase, dispatch `scout` now for the relevant facts (what exists, how it's structured, what conventions apply) so the discussion argues about reality, not guesses.
+5. **Ground truth.** If the topic touches the existing codebase, dispatch `scout` now for the relevant facts (what exists, how it's structured, what conventions apply) so the discussion argues about reality, not guesses. Do step 6 while scout runs — don't wait for it before checking previous sessions.
 6. **Previous sessions.** Glob for `brainstorm-*.md` in the current directory. If a file looks topically related, surface it: "We touched on this in `<file>` — continue that thread or start fresh?"
 7. Once topic, mode, and material questions are settled, briefly announce you'll kick off with a specialist panel, then move to Phase 1.
 
@@ -89,7 +89,7 @@ Now it's a dialogue between you and the user. Rhythm:
 - **Track separately as you go**: options considered (what's in, what's out), risks + mitigations, open questions, **and assumptions made** (anything you took as given without explicit confirmation — stack/timeline/team/scale/budget). When an assumption looks load-bearing for the direction, surface it: *"I'm assuming X — confirm or correct."* You'll need all of this for the artifact.
 - **Mode-aware dynamics**: in *converge* mode, drive toward a single direction. In *map* mode, hold variants open and develop them in parallel — don't prematurely collapse them.
 
-**On-demand specialist consults.** When a sub-question lands in a panel agent's lens and the kickoff didn't cover it, pull in that single agent for a focused take. Before doing so, tell the user: e.g. "Let me pull in `architect` for the boundary question." Use a compact prompt:
+**On-demand specialist consults.** When a sub-question lands in a panel agent's lens and the kickoff didn't cover it, pull in that single agent for a focused take. If the sub-question genuinely spans two lenses (e.g. a boundary decision with a security angle), pull both agents in one parallel message rather than consulting them in sequence. Before doing so, tell the user: e.g. "Let me pull in `architect` for the boundary question." Use a compact prompt:
 
 ```
 Brainstorming session, READ-ONLY, no file changes (including agent memory — read it if useful, but don't write).
