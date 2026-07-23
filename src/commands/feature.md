@@ -70,6 +70,6 @@ If the reviews (or the test run) return findings above nit level: send them to *
 ### Rules
 
 - Pass agent outputs forward — each agent must receive what the previous one produced; they do not share your context.
-- Whenever you dispatch more than one agent for independent work, put all the `Agent` calls in a single message so they run concurrently — never serialize dispatches that don't depend on each other.
+- Whenever you dispatch more than one subagent for independent work, dispatch them concurrently — all in a single message — so they run in parallel; never serialize dispatches that don't depend on each other.
 - Never skip the plan-approval gate, even for "small" features that grew out of the request.
 - Report failures verbatim; never smooth over a red test or an unresolved finding.

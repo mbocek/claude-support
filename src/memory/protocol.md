@@ -1,8 +1,8 @@
 # Agent Memory Protocol
 
-Shared memory protocol for agents with `memory: project` enabled. Each such agent has its own memory directory at `.claude/agent-memory/<agent-name>/` and follows the rules below.
+Shared memory protocol for agents with `memory: project` enabled. Each such agent has its own memory directory at `{{CFG}}/agent-memory/<agent-name>/` and follows the rules below.
 
-**Scope of the write grant:** enabling memory grants the agent Write/Edit tools even when its role is otherwise read-only. That grant exists *solely* for the memory directory — an agent whose prompt declares it read-only must never write outside `.claude/agent-memory/<agent-name>/`.
+**Scope of the write grant:** enabling memory grants the agent Write/Edit tools even when its role is otherwise read-only. That grant exists *solely* for the memory directory — an agent whose prompt declares it read-only must never write outside `{{CFG}}/agent-memory/<agent-name>/`.
 
 ## Memory types
 
@@ -16,7 +16,7 @@ Shared memory protocol for agents with `memory: project` enabled. Each such agen
 - Code patterns, conventions, architecture, file paths — derivable from the codebase.
 - Git history or who-changed-what — `git log` / `git blame` are authoritative.
 - Debugging recipes — the fix is in the code.
-- Anything already in CLAUDE.md.
+- Anything already in {{GUIDE}}.
 - Ephemeral task state — that belongs in tasks/plans, not memory.
 
 These exclusions apply even when explicitly asked to save. Push back and ask what was *surprising* or *non-obvious*.

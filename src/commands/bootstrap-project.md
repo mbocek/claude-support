@@ -1,23 +1,23 @@
 ---
 allowed-tools: Bash(ls:*), Bash(pwd:*), Bash(test:*), Bash(wc:*), Bash(echo:*), Bash(head:*), Read, Write, Edit, Grep, Glob, Agent, AskUserQuestion
 argument-hint: [audit | path]
-description: Audit or create the project's CLAUDE.md against the contract the generic agents rely on
+description: Audit or create the project's {{GUIDE}} against the contract the generic agents rely on
 ---
 
 ## Context
 
 - Arguments: $ARGUMENTS
 - Working directory: !`pwd`
-- Existing CLAUDE.md: !`test -f CLAUDE.md && echo "exists ($(wc -l < CLAUDE.md) lines)" || echo "missing"`
+- Existing {{GUIDE}}: !`test -f {{GUIDE}} && echo "exists ($(wc -l < {{GUIDE}}) lines)" || echo "missing"`
 - Repo root files: !`ls -1 | head -30`
 
-**Arguments** (optional): `audit` forces report-only mode — produce the gap report but make no edits even if the user would approve them; a path scopes the run to that subdirectory's `CLAUDE.md` instead of the repo root (useful in monorepos). Empty arguments mean: full run against the repo root.
+**Arguments** (optional): `audit` forces report-only mode — produce the gap report but make no edits even if the user would approve them; a path scopes the run to that subdirectory's `{{GUIDE}}` instead of the repo root (useful in monorepos). Empty arguments mean: full run against the repo root.
 
 ## Your task
 
-The generic agent set is stack-agnostic on purpose — `CLAUDE.md` is where each project supplies its
+The generic agent set is stack-agnostic on purpose — `{{GUIDE}}` is where each project supplies its
 stack, commands, and rules. This command makes sure the current project holds up its side of that
-contract. The contract template lives at `.claude/templates/claude-md-template.md` — read it first;
+contract. The contract template lives at `{{CFG}}/templates/project-guide-template.md` — read it first;
 its sections (What this is, Stack, Commands, Layout, Conventions, Boundaries, Verification) are the
 checklist.
 
@@ -29,15 +29,15 @@ commands (Makefile, package.json scripts, CI config are the best sources); (c) c
 boundaries, generated code, and existing docs stating rules. For a small repo a single scout
 covering all three is fine — but never run them one after another. Every command scout reports must
 be traceable to a definition in the repo (Makefile target, script entry, CI step)
-— a `CLAUDE.md` with an invented test command poisons every future agent run.
+— a `{{GUIDE}}` with an invented test command poisons every future agent run.
 
 **If discovery comes back nearly empty** — no build system, no source code, or a project type scout
 cannot read — do not fabricate anything. Report what was (not) found and ask the user for the
-missing facts; a `CLAUDE.md` containing only the sections the user confirmed is a valid outcome.
+missing facts; a `{{GUIDE}}` containing only the sections the user confirmed is a valid outcome.
 
 ### Step 2 — Audit or draft
 
-**If `CLAUDE.md` exists:** compare it against the template's sections and the scout's findings.
+**If `{{GUIDE}}` exists:** compare it against the template's sections and the scout's findings.
 Produce a gap report: missing sections, stale or wrong claims, and content that belongs elsewhere
 (long prose, duplicated README material). For suspicious commands, dispatch one **scout** with the
 full list to confirm each is still defined in the repo's build config — a single batched run, not
@@ -52,7 +52,7 @@ boundaries, what "done" means here — ask the user, batched into one round of q
 ### Step 3 — Confirm and write
 
 Show the user the proposed new file or the diff of proposed edits. Apply only after approval —
-`CLAUDE.md` steers every future session in this repo, so the user signs it off. In `audit` mode,
+`{{GUIDE}}` steers every future session in this repo, so the user signs it off. In `audit` mode,
 stop after presenting the report and proposed edits; make no writes regardless of approval — the
 user reruns without `audit` to apply.
 

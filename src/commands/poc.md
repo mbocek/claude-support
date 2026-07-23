@@ -56,6 +56,6 @@ Once the user approves, **`/poc` is done.** Do not run reviewers, tests, or `/co
 ### Rules
 
 - Pass agent outputs forward — each agent receives what the previous one produced; they do not share your context.
-- When work is genuinely independent, put all `Agent` calls in a single message so they run concurrently.
+- When work is genuinely independent, dispatch the subagents concurrently — all in a single message — so they run in parallel.
 - Report failures verbatim — if the PoC doesn't run, say so; never present a broken prototype as working.
 - Never quietly slide into full-feature mode: no tests, no review, no commit inside `/poc`. That is `/feature`'s job.

@@ -50,7 +50,7 @@ Announce each phase transition with a one-line marker — e.g. *"→ Phase 1: sp
 
 Pick **2–4 panel agents** whose lens is genuinely relevant. **Aim for diversity of angle** — a designer + a practitioner + one cross-cutting lens (security, testability, explainability) beats three variations of the same viewpoint. `architect` almost always belongs; add `security-reviewer` whenever the topic touches auth, money, user data, or external input. Do not spawn agents whose lens doesn't touch the topic, and never spawn `fable-consultant` in the kickoff — it is Phase 2 escalation only.
 
-**Dispatch them in parallel — all `Agent` calls in a single message.** Agent prompts always stay in English regardless of the user's language; only your user-facing synthesis afterwards matches the user's language.
+**Dispatch them in parallel — all in a single message.** Agent prompts always stay in English regardless of the user's language; only your user-facing synthesis afterwards matches the user's language.
 
 Prompt template for each agent:
 
