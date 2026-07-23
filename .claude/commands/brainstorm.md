@@ -1,7 +1,7 @@
 ---
 allowed-tools: Agent, Read, Write, Grep, Glob, Bash(date:*), Bash(pwd)
 argument-hint: [topic]
-description: Brainstorm a topic as a sparring partner, with the agent panel on call — feeds /feature
+description: Brainstorm a topic as a sparring partner, with the agent panel on call — feeds /poc or /feature
 ---
 
 ## Context
@@ -136,7 +136,7 @@ This is opt-in — use it when stakes warrant the friction, not for every decisi
 
 **Language policy.** The artifact body and section headings should be in the user's language (matches the session). Frontmatter, fenced code blocks, command names (`/feature`, `/commit`), and agent names stay as-is.
 
-The artifact has a second job: **it is the input for `/feature`.** Write "Core direction", "Assumptions", and "Open questions" so that the architect can start from decisions, not re-derive them — decided means decided, open means explicitly open.
+The artifact has a second job: **it is the input for the build step — either `/poc` or `/feature`.** Write "Core direction", "Assumptions", and "Open questions" so that the next command can start from decisions, not re-derive them — decided means decided, open means explicitly open. `/feature` reads the whole contract (architect settles the open questions); `/poc` reads just the core direction to prototype fast and leaves the open questions for the later `/feature` pass.
 
 When the user signals done:
 
@@ -175,7 +175,7 @@ _Language: {user's language} · Mode: {converge|map} · Panel: `agent1`, `agent2
 - {Unresolved items — /feature's architect must treat these as inputs to settle or escalate, not silently decide.}
 
 ## Next steps
-- {Concrete short list. When the direction is buildable, the first step is usually: `/feature` with this artifact as input. Point to /consult if a hard decision remained open.}
+- {Concrete short list. When the direction is buildable, the first step is a build command with this artifact as input: `/poc <artifact>` to derisk a fresh or uncertain direction with a fast prototype first, or `/feature <artifact>` to build it properly in one pass. Point to /consult if a hard decision remained open.}
 
 ## Panel input
 {Which agents were consulted and the one-line contribution each made.}
@@ -185,7 +185,7 @@ _To be filled after implementation: did this direction hold up? What changed? Le
 ```
 
 4. After writing, confirm the path back in one line. Do not summarize the content — the user just wrote it with you.
-5. Offer the bridge forward (in the user's language): commit the artifact via `/commit`, and when they're ready to build — *"`/feature brainstorm-<slug>-<date>.md`"*. Wait for confirmation; never trigger either automatically.
+5. Offer the bridge forward (in the user's language): commit the artifact via `/commit`, and when they're ready to build, name **both** paths so the user picks — *"`/poc brainstorm-<slug>-<date>.md`"* to prototype the direction fast first, or *"`/feature brainstorm-<slug>-<date>.md`"* to build it properly in one pass. Suggest `/poc` first when the direction is new or uncertain and worth derisking; `/feature` when it's well-understood and ready to build. Wait for confirmation; never trigger either automatically.
 
 ## Guardrails
 

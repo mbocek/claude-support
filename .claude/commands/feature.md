@@ -16,7 +16,16 @@ Drive a feature from request to reviewed implementation using the agent pipeline
 
 If `$ARGUMENTS` is empty, ask the user what to build before doing anything else.
 
-### Phase 0 — Brainstorm handoff (when applicable)
+### Phase 0 — Handoff pickup (when applicable)
+
+**PoC handoff.** If the request indicates a proof of concept already exists — the user says they ran `/poc`, hands you a PoC summary, or the working tree holds uncommitted changes that clearly implement the request — treat the PoC as the **starting implementation, not something to rebuild.** In that case:
+
+- Skip Phases 1–3 for the parts the PoC already covers. Do **not** re-scout, re-plan, or re-implement working code from scratch.
+- Read the PoC summary (or inspect the working-tree diff) to understand what was built and which shortcuts it took — those shortcuts are the work: missing tests, error handling, edge cases, security.
+- Establish the PoC diff as the review scope: run `git diff` (and `git status` for untracked files) to get the concrete file list the PoC touched, and pass that list to the reviewers and test-engineer — in a PoC handoff there is no implementer report to scope them from. Then enter at **Phase 4 (test & review)** over that diff and run the fix loop until it is production-quality. If the PoC left a genuine gap that needs new code (not just hardening), scope that gap through the architect/implementer first, but keep the working PoC as the base.
+- Still honor the approval gate for any *new* design decisions the hardening surfaces — but the PoC's core direction is already accepted by virtue of the user running `/feature` on it.
+
+**Brainstorm handoff.**
 
 If `$ARGUMENTS` names a `brainstorm-*.md` file (or one in the working directory clearly matches the request), read it first — it is the decision record from `/brainstorm`. Contract for using it:
 
