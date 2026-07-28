@@ -13,7 +13,7 @@ description: >
   - During /feature, implementer executes the architect's plan step by step.
 tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
 model: sonnet
-effort: high
+effort: medium
 color: green
 memory: project
 ---

@@ -14,7 +14,7 @@ description: >
   - "Final sanity check of this data-migration plan before we execute it."
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: fable
-effort: high
+effort: xhigh
 color: pink
 memory: project
 ---

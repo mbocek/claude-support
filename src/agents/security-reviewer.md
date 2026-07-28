@@ -13,7 +13,6 @@ description: >
   - During /feature, dispatch it alongside code-reviewer when the change touches a sensitive surface.
 tools: Read, Bash, Grep, Glob, WebFetch, WebSearch
 model: opus
-effort: high
 color: red
 memory: project
 ---

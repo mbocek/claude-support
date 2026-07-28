@@ -23,22 +23,26 @@ Re-running replaces the installed files wholesale; your own files, including sav
 - **Roles by phase, not by stack.** Agents map to pipeline stages (recon → design → implementation → verification). Stack specifics live in each project's guide file, which every agent reads first — so the same set works in any repo.
 - **Model by leverage** *(Claude Code only)*. Haiku does mechanical work, Sonnet implements, Opus designs and reviews, Fable is escalation-only.
 - **Verification asymmetry.** Code is written by a cheaper model and reviewed by a stronger one.
+- **Effort only where it deviates** *(Claude Code only)*. `effort` in frontmatter overrides the session level, and `high` is already the default on every model that supports effort — so writing it out would only break `/effort` as a global cost dial. It is set only where the agent must differ from whatever the session chose. Haiku [does not support effort at all](https://code.claude.com/docs/en/model-config#adjust-effort-level), so Haiku agents carry none.
+- **Cost scales with the change** *(see `/feature`)*. The full pipeline is for real features; small, localized diffs run a reduced set of agents rather than the whole gate.
 
 Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast lane and `/debug` / `/consult` as escalations.
 
 ## Agents
 
+`effort` below is the frontmatter override; *session* means the agent inherits whatever `/effort` is set to.
+
 | Agent | Model / effort | Access | Role |
 |-------|----------------|--------|------|
-| `scout` | haiku / low | read-only | Fast reconnaissance — locates code, maps conventions |
-| `architect` | opus / high | read-only | Design and planning — boundaries, contracts, ordered steps, risks |
-| `implementer` | sonnet / high | write | Writes code following the plan and surrounding conventions |
+| `scout` | haiku / — | read-only | Fast reconnaissance — locates code, maps conventions |
+| `architect` | opus / *session* | read-only | Design and planning — boundaries, contracts, ordered steps, risks |
+| `implementer` | sonnet / medium | write | Writes code following the plan and surrounding conventions |
 | `test-engineer` | sonnet / medium | write | Behavior-focused tests using the project's framework |
-| `code-reviewer` | opus / high | read-only | Verification gate — correctness, concurrency, contracts |
-| `security-reviewer` | opus / high | read-only | Adversarial review — injection, authN/Z, secrets, trust boundaries |
+| `code-reviewer` | opus / *session* | read-only | Verification gate — correctness, concurrency, contracts |
+| `security-reviewer` | opus / *session* | read-only | Adversarial review — injection, authN/Z, secrets, trust boundaries |
 | `debugger` | opus / xhigh | write | Root-cause analysis; fixes only on request |
-| `docs-writer` | haiku / low | docs only | READMEs, changelogs, runbooks — verified against the code |
-| `fable-consultant` | fable / high | read-only | Escalation-only second opinion; invoked via `/consult` |
+| `docs-writer` | haiku / — | docs only | READMEs, changelogs, runbooks — verified against the code |
+| `fable-consultant` | fable / xhigh | read-only | Escalation-only second opinion; invoked via `/consult` |
 
 ## Commands
 

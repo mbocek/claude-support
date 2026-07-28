@@ -12,7 +12,6 @@ description: >
   - At the end of /feature, docs-writer updates whatever documentation the change made stale.
 tools: Read, Write, Edit, Grep, Glob
 model: haiku
-effort: low
 color: purple
 ---
 

@@ -13,7 +13,6 @@ description: >
   - Before /feature planning, proactively use scout to gather context for the architect.
 tools: Read, Grep, Glob, Bash
 model: haiku
-effort: low
 color: cyan
 ---
 

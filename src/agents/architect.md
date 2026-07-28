@@ -12,7 +12,6 @@ description: >
   - During /feature, architect produces the plan the implementer executes.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: opus
-effort: high
 color: blue
 memory: project
 ---

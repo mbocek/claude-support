@@ -12,7 +12,6 @@ description: >
   - During /feature, code-reviewer gates the implementation before the task is done.
 tools: Read, Bash, Grep, Glob
 model: opus
-effort: high
 color: yellow
 memory: project
 ---
