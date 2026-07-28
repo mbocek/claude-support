@@ -6,8 +6,6 @@ description: >
   documentation files — never touches source code.
 
   Examples:
-  - "Update the README for the new CLI flags."
-  - "Write a runbook for the deployment process we just built."
   - "The API docs are stale after the v2 endpoint changes — sync them."
   - At the end of /feature, docs-writer updates whatever documentation the change made stale.
 tools: Read, Write, Edit, Grep, Glob

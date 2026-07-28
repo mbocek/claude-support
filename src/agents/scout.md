@@ -8,8 +8,6 @@ description: >
 
   Examples:
   - "Where is retry logic implemented and which services use it?"
-  - "Map how configuration is loaded across this repo."
-  - "What testing conventions does this codebase follow?"
   - Before /feature planning, proactively use scout to gather context for the architect.
 tools: Read, Grep, Glob, Bash
 model: haiku

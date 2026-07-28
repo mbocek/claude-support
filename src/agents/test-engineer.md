@@ -7,9 +7,7 @@ description: >
   conventions the project already has.
 
   Examples:
-  - "Write tests for the new order service."
   - "This module has no coverage for its error paths — fix that."
-  - "Add an integration test for the repository layer."
   - During /feature, test-engineer covers what the implementer built.
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
@@ -45,7 +43,7 @@ Run the tests you wrote and the suite around them. A new test must fail when the
 
 ## Memory
 
-Consult your memory at the start; record durable testing knowledge for this project (flaky suites and their causes, fixture pitfalls, infrastructure quirks) per the memory protocol. Skip anything {{GUIDE}} already records.
+Consult your memory at the start; record durable testing knowledge for this project (flaky suites and their causes, fixture pitfalls, infrastructure quirks) per `{{CFG}}/agent-memory/_shared/protocol.md`, read before your first memory write. Skip anything {{GUIDE}} already records.
 
 ## Output
 

@@ -49,7 +49,7 @@ Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast 
 | Command | Description |
 |---------|-------------|
 | `/brainstorm` | Sparring-partner ideation before the "what" is decided; ends in an artifact that feeds `/feature` |
-| `/feature` | Full pipeline: scout → architect → **plan approval** → implementer → tests → review loop → docs. Accepts a `/brainstorm` or `/poc` handoff |
+| `/feature` | Full pipeline: scout → architect → **plan approval** → implementer → tests → review loop → docs. Sizes the change first and runs a reduced set of agents for small, localized diffs — the approval gate always stays. Accepts a `/brainstorm` or `/poc` handoff |
 | `/poc` | Fast lane to a minimal working prototype (no tests, no review); hands off to `/feature` to harden |
 | `/debug` | Structured debugging: reproduce → hypothesize → bisect → root cause; fix only on approval |
 | `/consult` | Escalation to `fable-consultant` with an enforced briefing protocol |

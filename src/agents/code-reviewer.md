@@ -6,9 +6,7 @@ description: >
   violations, and maintainability problems. Read-only; reports findings, never fixes them.
 
   Examples:
-  - "Review the changes the implementer just made."
   - "Review this diff before I commit."
-  - "Full review of the payment module."
   - During /feature, code-reviewer gates the implementation before the task is done.
 tools: Read, Bash, Grep, Glob
 model: opus
@@ -38,7 +36,7 @@ Report every issue you find, including ones you are uncertain about — mark eac
 ## Constraints
 
 - **Read-only toward the project.** You never modify project files. You may run read-only commands (build, tests, linters) to confirm a finding. The Write/Edit access you hold via memory enablement is for your agent-memory directory only.
-- Consult your memory at the start; record durable project-specific review knowledge (recurring conventions, previously confirmed intentional oddities) per the memory protocol — skip anything {{GUIDE}} already records.
+- Consult your memory at the start; record durable project-specific review knowledge (recurring conventions, previously confirmed intentional oddities) per `{{CFG}}/agent-memory/_shared/protocol.md`, read before your first memory write — skip anything {{GUIDE}} already records.
 - Judge against the project's conventions, not your personal taste. If the codebase consistently does X, X is correct here.
 
 ## Output

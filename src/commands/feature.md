@@ -34,13 +34,28 @@ If `$ARGUMENTS` names a `brainstorm-*.md` file (or one in the working directory 
 - Carry the artifact's risks into the plan's risk section so mitigations become steps, not prose.
 - **Map-mode artifact** (has `## Variants explored` instead of `## Core direction`): the "what" is not decided yet, so do not start the pipeline. Summarize the variants and use AskUserQuestion to have the user pick one (or send them back to `/brainstorm` / `/consult` to converge). Only after a variant is chosen does it become the core direction and the pipeline proceeds.
 
+### Phase 0.5 — Size the change, then scale the pipeline to it
+
+The full pipeline is calibrated for a real feature. Running all of it on a two-file change spends several strong-model agents to guard a diff a single reviewer could hold in its head. Before Phase 1, decide which track this request is on and **state the choice to the user in one line** ("small track: no architect, single reviewer") so they can override it.
+
+**Small track** — all of these hold: the change is localized to files you can already name, it adds no new dependency, public contract, or schema change, and it touches none of the sensitive surfaces listed in Phase 4. Then:
+
+- No scout fan-out. One focused scout, or none if the request already names the files.
+- No architect dispatch. **You** write the plan — goal, the two or three steps, what could break — and it still goes through the Phase 2 approval gate. The gate protects the user's decision, not the architect's dispatch.
+- Phase 4 runs `code-reviewer` alone; `test-engineer` only if the change alters behavior rather than text or config.
+- Phase 6 dispatches `docs-writer` only if a document actually names what you changed.
+
+**Full track** — everything else, and always when the request is a new feature or subsystem, spans multiple areas, changes a contract, or touches a sensitive surface. If sizing is genuinely unclear, take the full track; under-reviewing is the more expensive mistake.
+
+Re-size once, upward only: if the small track uncovers real design work, stop and escalate to the full track from Phase 2 rather than improvising.
+
 ### Phase 1 — Recon (scout)
 
 Dispatch **scout** with the feature request and ask for: the parts of the codebase the feature touches, existing analogous implementations, relevant conventions, and gaps. When the feature spans clearly separable areas (e.g. API + persistence + UI, or several services), fan out multiple scouts — one focused question each, all dispatched in a single message so they run concurrently — and merge their reports for the architect. Skip this phase only when the change is trivially localized and you already know the target files.
 
 ### Phase 2 — Plan (architect)
 
-Dispatch **architect** with the feature request, the scout report, and — when present — the brainstorm artifact contract from Phase 0. Require the standard plan output (goal, design, ordered steps, risks, verification).
+On the small track, skip the dispatch and write the plan yourself, then go straight to the decision gate below. Otherwise dispatch **architect** with the feature request, the scout report, and — when present — the brainstorm artifact contract from Phase 0. Require the standard plan output (goal, design, ordered steps, risks, verification).
 
 **Decision gate:** present the plan to the user — goal, design summary, steps, and especially risks/open questions. Use AskUserQuestion when the plan contains a genuine either-or the user must decide. Do not proceed to implementation until the user approves the plan or amends it. If the working tree is dirty, point that out here so the user can decide whether to commit/stash first.
 
@@ -50,7 +65,7 @@ Dispatch **implementer** with the approved plan and scout context. For plans wit
 
 ### Phase 4 — Test & review, first round (test-engineer, code-reviewer, security-reviewer)
 
-Once the implementation lands, dispatch the verification agents **in parallel, in a single message**:
+Once the implementation lands, dispatch the verification agents **in parallel, in a single message** — the set that the Phase 0.5 track calls for:
 
 - **test-engineer** with the implementer's report and the plan's verification criteria: cover the new behavior, run the relevant suite. Skip only if the implementer already added the tests the plan required and ran them green.
 - **code-reviewer** on the implementation change. Scope it to the implementer's reported files/diff and tell it regression tests are being authored concurrently — it should not flag missing coverage in this round; the re-review covers the tests.
@@ -60,7 +75,11 @@ These are safe to run concurrently because the reviewers are read-only and the t
 
 ### Phase 5 — Fix loop
 
-If the reviews (or the test run) return findings above nit level: send them to **implementer** to fix, then re-dispatch the affected reviewers — in parallel if both had findings — on the fixes plus the new tests. Repeat until the reviewers approve or only accepted nits remain. Cap the loop at 3 rounds — if it's still failing, stop and escalate to the user with the open findings.
+If the reviews (or the test run) return findings above nit level: send them to **implementer** to fix, then re-dispatch the affected reviewers — in parallel if both had findings — on the fixes plus the new tests.
+
+Scope the re-dispatch as a **delta review, not a fresh full review**: give the reviewer its own prior findings verbatim, the diff of the fixes, and the new test files, and ask it to (a) confirm each finding is actually resolved and (b) check the fix itself for new defects. It should not re-derive the whole change from scratch — that is what makes a three-round loop cost as much as three full reviews.
+
+Repeat until the reviewers approve or only accepted nits remain. Cap the loop at 3 rounds — if it's still failing, stop and escalate to the user with the open findings.
 
 ### Phase 6 — Close out
 
@@ -71,5 +90,6 @@ If the reviews (or the test run) return findings above nit level: send them to *
 
 - Pass agent outputs forward — each agent must receive what the previous one produced; they do not share your context.
 - Whenever you dispatch more than one subagent for independent work, dispatch them concurrently — all in a single message — so they run in parallel; never serialize dispatches that don't depend on each other.
-- Never skip the plan-approval gate, even for "small" features that grew out of the request.
+- Never skip the plan-approval gate, even for "small" features that grew out of the request. The small track drops the architect *dispatch*, never the gate.
+- Every dispatch costs real tokens. Dispatch an agent when its verdict can change what happens next; do not add one for reassurance.
 - Report failures verbatim; never smooth over a red test or an unresolved finding.
