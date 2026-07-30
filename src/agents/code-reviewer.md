@@ -7,7 +7,7 @@ description: >
 
   Examples:
   - "Review this diff before I commit."
-  - During /feature, code-reviewer gates the implementation before the task is done.
+  - During /feature, code-reviewer gates a large, cross-module, or contract-changing diff before the task is done.
 tools: Read, Bash, Grep, Glob
 model: opus
 color: yellow

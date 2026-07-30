@@ -1,6 +1,7 @@
 ---
-allowed-tools: Bash(git:*), Bash(pwd:*), Bash(echo:*), Read, Grep, Glob, Agent, AskUserQuestion
-description: End-to-end feature pipeline — scout → architect → approval → implementer → parallel tests + review → fix loop
+allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Agent, AskUserQuestion
+argument-hint: [feature request | brainstorm-*.md | (after /poc)]
+description: End-to-end feature work done inline — plan → implement → tests and e2e → review subagents only where they earn it → fix loop
 ---
 
 ## Context
@@ -12,84 +13,82 @@ description: End-to-end feature pipeline — scout → architect → approval �
 
 ## Your task
 
-Drive a feature from request to reviewed implementation using the agent pipeline. The pipeline encodes the discipline: no implementation without a plan, no completion without a clean review. You are the orchestrator — you dispatch agents, carry context between them, and involve the user only at the decision points marked below.
+Take the request to a finished, verified change **yourself, in this session**. You plan, you implement, you run the tests. The only subagents you may dispatch are `code-reviewer` and `security-reviewer`, and only when the triggers in step 5 fire — everything else is your own work.
 
-If `$ARGUMENTS` is empty, ask the user what to build before doing anything else.
+If `$ARGUMENTS` is empty, ask what to build before doing anything else.
 
-### Phase 0 — Handoff pickup (when applicable)
+### Working style
 
-**PoC handoff.** If the request indicates a proof of concept already exists — the user says they ran `/poc`, hands you a PoC summary, or the working tree holds uncommitted changes that clearly implement the request — treat the PoC as the **starting implementation, not something to rebuild.** In that case:
+- **Solve it yourself.** Interrupt the user only for an answer that is genuinely not yours to give — a scope or product decision, or a fact you cannot get from the code or the repo.
+- **Work around, then report.** When something blocks you mid-run and a reasonable workaround exists, take it, keep going, and put it in the closing summary instead of stopping.
+- **Quiet while working.** No phase announcements, no running commentary.
+- **Report failures verbatim.** Never narrate around a red test or an unresolved finding.
 
-- Skip Phases 1–3 for the parts the PoC already covers. Do **not** re-scout, re-plan, or re-implement working code from scratch.
-- Read the PoC summary (or inspect the working-tree diff) to understand what was built and which shortcuts it took — those shortcuts are the work: missing tests, error handling, edge cases, security.
-- Establish the PoC diff as the review scope: run `git diff` (and `git status` for untracked files) to get the concrete file list the PoC touched, and pass that list to the reviewers and test-engineer — in a PoC handoff there is no implementer report to scope them from. Then enter at **Phase 4 (test & review)** over that diff and run the fix loop until it is production-quality. If the PoC left a genuine gap that needs new code (not just hardening), scope that gap through the architect/implementer first, but keep the working PoC as the base.
-- Still honor the approval gate for any *new* design decisions the hardening surfaces — but the PoC's core direction is already accepted by virtue of the user running `/feature` on it.
+### 1. Input
 
-**Brainstorm handoff.**
+The request arrives in one of three shapes:
 
-If `$ARGUMENTS` names a `brainstorm-*.md` file (or one in the working directory clearly matches the request), read it first — it is the decision record from `/brainstorm`. Contract for using it:
+- **PoC handoff** — the user ran `/poc`, hands you its summary, or the working tree holds uncommitted changes that clearly implement the request. The PoC is the **starting implementation, not something to rebuild**: do not re-plan or rewrite working code. The `/poc` summary is the authority on what was built — its shortcuts and the calls it made on its own *are* this run's work list; derive that list from the diff yourself only when no summary is at hand. `git diff` plus `git status` for untracked files gives the scope. Its core direction is already accepted by virtue of the user running `/feature` on it, so skip step 2's planning for what already works — but the work list itself goes through step 3: every shortcut on it gets turned into real code (error handling, edge cases, the hardcoded value made real) before anything is verified. Plan properly only the genuine gaps that need new design, not just hardening.
+- **Brainstorm artifact** — `$ARGUMENTS` names a `brainstorm-*.md` file, or one in the working directory clearly matches the request. Read it: **Core direction and Assumptions are decided**, so treat them as givens and do not re-litigate them; if the real code makes a decided item untenable, that goes back to the user, never into silent redesign. **Open questions are genuinely open** — settle each one explicitly in the plan or put it to the user at the gate; never resolve one silently. Carry its risks into the plan as steps, not prose. If the artifact is map-mode (`## Variants explored` instead of `## Core direction`), the "what" is not decided: have the user pick a variant before you plan anything.
+- **Plain request** — start from the code.
 
-- **Core direction and Assumptions are decided.** Pass them to the architect as givens; do not re-litigate them. If the architect finds a decided item untenable against the real code, that goes back to the user, not into silent redesign.
-- **Open questions are genuinely open.** The architect must settle each one explicitly in the plan or surface it at the approval gate — never resolve one silently.
-- Carry the artifact's risks into the plan's risk section so mitigations become steps, not prose.
-- **Map-mode artifact** (has `## Variants explored` instead of `## Core direction`): the "what" is not decided yet, so do not start the pipeline. Summarize the variants and use AskUserQuestion to have the user pick one (or send them back to `/brainstorm` / `/consult` to converge). Only after a variant is chosen does it become the core direction and the pipeline proceeds.
+### 2. Plan
 
-### Phase 0.5 — Size the change, then scale the pipeline to it
+Orient yourself first: the files the change touches, the conventions in `{{GUIDE}}`, and any analogous implementation already in the repo. Then write the plan — goal, ordered steps, what could break, and how you will verify it. Keep it yours; it does not need to be shown unless the gate below fires.
 
-The full pipeline is calibrated for a real feature. Running all of it on a two-file change spends several strong-model agents to guard a diff a single reviewer could hold in its head. Before Phase 1, decide which track this request is on and **state the choice to the user in one line** ("small track: no architect, single reviewer") so they can override it.
+**Approval gate — conditional.** Stop and present the plan only when it contains a decision that is genuinely the user's:
 
-**Small track** — all of these hold: the change is localized to files you can already name, it adds no new dependency, public contract, or schema change, and it touches none of the sensitive surfaces listed in Phase 4. Then:
+- a trade-off the code cannot settle,
+- a change to a public contract, schema, or user-visible behavior,
+- a new dependency,
+- something hard to reverse (data migration, deletion, external side effect),
+- an open question carried in from a brainstorm artifact.
 
-- No scout fan-out. One focused scout, or none if the request already names the files.
-- No architect dispatch. **You** write the plan — goal, the two or three steps, what could break — and it still goes through the Phase 2 approval gate. The gate protects the user's decision, not the architect's dispatch.
-- Phase 4 runs `code-reviewer` alone; `test-engineer` only if the change alters behavior rather than text or config.
-- Phase 6 dispatches `docs-writer` only if a document actually names what you changed.
+Use AskUserQuestion when it is a real either-or. If the plan holds no such decision, do not open a gate — build it. If the working tree was already dirty when you started, say so here in one line.
 
-**Full track** — everything else, and always when the request is a new feature or subsystem, spans multiple areas, changes a contract, or touches a sensitive surface. If sizing is genuinely unclear, take the full track; under-reviewing is the more expensive mistake.
+### 3. Implement
 
-Re-size once, upward only: if the small track uncovers real design work, stop and escalate to the full track from Phase 2 rather than improvising.
+Write the code yourself, following the surrounding conventions. Keep the plan honest: when reality contradicts it, re-plan — and re-check whether the change now trips the gate — rather than improvising past it.
 
-### Phase 1 — Recon (scout)
+### 4. Verify — the whole loop
 
-Dispatch **scout** with the feature request and ask for: the parts of the codebase the feature touches, existing analogous implementations, relevant conventions, and gaps. When the feature spans clearly separable areas (e.g. API + persistence + UI, or several services), fan out multiple scouts — one focused question each, all dispatched in a single message so they run concurrently — and merge their reports for the architect. Skip this phase only when the change is trivially localized and you already know the target files.
+This is what separates `/feature` from `/poc`, so none of it is optional:
 
-### Phase 2 — Plan (architect)
+- Cover the new behavior with tests, at the level and in the framework the project already tests at.
+- Run the unit/integration suite, then the e2e suite where the project has one. Commands come from `{{GUIDE}}`; discover them if the guide is silent, and say so plainly if the project has none.
+- **Green means observed green.** A suite you did not run is not a passing suite. Report red output verbatim and fix it — never report verification you did not actually perform.
 
-On the small track, skip the dispatch and write the plan yourself, then go straight to the decision gate below. Otherwise dispatch **architect** with the feature request, the scout report, and — when present — the brainstorm artifact contract from Phase 0. Require the standard plan output (goal, design, ordered steps, risks, verification).
+### 5. Review
 
-**Decision gate:** present the plan to the user — goal, design summary, steps, and especially risks/open questions. Use AskUserQuestion when the plan contains a genuine either-or the user must decide. Do not proceed to implementation until the user approves the plan or amends it. If the working tree is dirty, point that out here so the user can decide whether to commit/stash first.
+Dispatch **`security-reviewer`** — mandatory, not a judgment call — whenever the change touches authentication or authorization, secrets or credentials, payments, parsing of user-controlled input, file or path handling, deserialization, or outbound calls to external systems. Self-reviewing your own code for security is the weakest check there is.
 
-### Phase 3 — Implement (implementer)
+Dispatch **`code-reviewer`** when the diff is large, spans several modules, changes a public contract or a schema, or involves concurrency, migrations, or caching.
 
-Dispatch **implementer** with the approved plan and scout context. For plans with independent steps touching disjoint files, dispatch parallel implementer runs — one per independent step, all in a single message so they run concurrently; only execute sequentially when steps share files or depend on each other's output. If the implementer reports a conflict between the plan and reality, take it back to the architect (or the user, if it changes scope) rather than letting the implementer improvise.
+When both trigger, dispatch them in a single message so they run in parallel. They do not share your context — give each the concrete file list or diff, the plan, and the tests you wrote.
 
-### Phase 4 — Test & review, first round (test-engineer, code-reviewer, security-reviewer)
+When neither trigger fires, do your own review pass over the full diff instead: read it as a whole against the plan, hunting for what you got wrong rather than confirming that it looks fine.
 
-Once the implementation lands, dispatch the verification agents **in parallel, in a single message** — the set that the Phase 0.5 track calls for:
+### 6. Fix loop
 
-- **test-engineer** with the implementer's report and the plan's verification criteria: cover the new behavior, run the relevant suite. Skip only if the implementer already added the tests the plan required and ran them green.
-- **code-reviewer** on the implementation change. Scope it to the implementer's reported files/diff and tell it regression tests are being authored concurrently — it should not flag missing coverage in this round; the re-review covers the tests.
-- **security-reviewer**, if the change touches auth, secrets, payments, user input parsing, file handling, or external calls.
+Fix findings above nit level yourself. Then re-dispatch only the reviewer that raised them, as a **delta review, not a fresh one**: give it its own findings verbatim, the diff of the fixes, and the new tests, and ask it to confirm each finding is resolved and to check the fixes for new defects. It should not re-derive the whole change — that is what makes a three-round loop cost as much as three full reviews.
 
-These are safe to run concurrently because the reviewers are read-only and the test-engineer only adds test files outside the reviewed diff.
+Cap the loop at 3 rounds. If findings survive that, stop and carry them into the summary as open.
 
-### Phase 5 — Fix loop
+### 7. Close out
 
-If the reviews (or the test run) return findings above nit level: send them to **implementer** to fix, then re-dispatch the affected reviewers — in parallel if both had findings — on the fixes plus the new tests.
+Update documentation the change made stale — README, API docs, runbooks — yourself.
 
-Scope the re-dispatch as a **delta review, not a fresh full review**: give the reviewer its own prior findings verbatim, the diff of the fixes, and the new test files, and ask it to (a) confirm each finding is actually resolved and (b) check the fix itself for new defects. It should not re-derive the whole change from scratch — that is what makes a three-round loop cost as much as three full reviews.
+Then give **one summary: short by default, detailed only where detail carries weight.**
 
-Repeat until the reviewers approve or only accepted nits remain. Cap the loop at 3 rounds — if it's still failing, stop and escalate to the user with the open findings.
+- What was built, and what verification actually ran — suite, e2e, reviewers — with the real result.
+- Files changed.
+- **Open / deferred** — everything you worked around, every call you made alone, anything you could not resolve, and any surviving review findings. This is the section that earns its detail.
 
-### Phase 6 — Close out
-
-- If the change made documentation stale (README, API docs, runbooks), dispatch **docs-writer**.
-- Summarize for the user: what was built, files changed, verification and review results, and anything left open. Do **not** commit — suggest `/commit` instead.
+Do not commit — suggest `/commit`.
 
 ### Rules
 
-- Pass agent outputs forward — each agent must receive what the previous one produced; they do not share your context.
-- Whenever you dispatch more than one subagent for independent work, dispatch them concurrently — all in a single message — so they run in parallel; never serialize dispatches that don't depend on each other.
-- Never skip the plan-approval gate, even for "small" features that grew out of the request. The small track drops the architect *dispatch*, never the gate.
-- Every dispatch costs real tokens. Dispatch an agent when its verdict can change what happens next; do not add one for reassurance.
-- Report failures verbatim; never smooth over a red test or an unresolved finding.
+- The only subagents `/feature` dispatches are `code-reviewer` and `security-reviewer`, per the triggers in step 5. Everything else is your own work.
+- The security trigger is a hard rule, not a preference — when the change touches a listed surface, the reviewer runs.
+- Do not interrupt for what you can decide; do not decide what is the user's to decide.
+- Never present unverified work as finished.

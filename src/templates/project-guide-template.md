@@ -1,9 +1,8 @@
 # {{GUIDE}} contract template
 
-This template defines the sections a project's `{{GUIDE}}` must provide for the generic agent set
-(scout, architect, implementer, test-engineer, code-reviewer, security-reviewer, debugger,
-docs-writer, fable-consultant) to work well. The agents are stack-agnostic by design — this file is
-where the project supplies the stack. `/bootstrap-project` audits or creates a `{{GUIDE}}` against it.
+This template defines the sections a project's `{{GUIDE}}` must provide for the commands and the
+generic agent set (scout, code-reviewer, security-reviewer, debugger, fable-consultant) to work
+well. They are stack-agnostic by design — this file is where the project supplies the stack. `/bootstrap-project` audits or creates a `{{GUIDE}}` against it.
 
 Keep the real file short and factual: every line should change how an agent behaves. Delete any
 section that does not apply rather than leaving placeholder prose.
@@ -32,6 +31,7 @@ section that does not apply rather than leaving placeholder prose.
 - Build: `<command>`
 - Test (all): `<command>`
 - Test (single package/file): `<command>`
+- E2E / integration suite: `<command>` <!-- or "none" — /feature runs this and needs to know -->
 - Lint / format: `<command>`
 - Run locally: `<command>`
 

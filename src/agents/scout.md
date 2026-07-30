@@ -4,11 +4,11 @@ description: >
   Read-only reconnaissance agent. Use it whenever answering a question means sweeping many files,
   directories, or naming conventions and you only need the conclusion — where something is defined,
   how a pattern is used across the repo, what conventions the codebase follows, who calls what.
-  Dispatch it before planning or implementing so later agents start with a map instead of a blank page.
+  Dispatch it before planning or implementing so the work starts from a map instead of a blank page.
 
   Examples:
   - "Where is retry logic implemented and which services use it?"
-  - Before /feature planning, proactively use scout to gather context for the architect.
+  - Before a /brainstorm discussion, gather ground truth about how the area works today.
 tools: Read, Grep, Glob, Bash
 model: haiku
 color: cyan
