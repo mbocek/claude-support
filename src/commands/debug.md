@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git:*), Bash(echo:*), Read, Grep, Glob, Agent, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(echo:*), Read, Grep, Glob, Agent, SendMessage, AskUserQuestion
 description: Structured debugging — reproduce → hypothesize → bisect → root cause → optional fix
 ---
 
@@ -18,7 +18,7 @@ If `$ARGUMENTS` is empty, ask the user for: the observed behavior, the expected 
 
 ### Step 1 — Collect the evidence
 
-Gather what exists before dispatching: error output, failing test names, logs, the suspected timeframe ("started after Friday's deploy" → candidate commit range from `git log`). The evidence sources are independent — collect them with parallel tool calls in a single message (git log + grep for the failing test + read the log file at once), not one by one. Ask the user for artifacts they mentioned but didn't paste. Evidence collected here saves the expensive agent's tokens.
+Gather what exists before dispatching: error output, failing test names, logs, the suspected timeframe ("started after Friday's deploy" → candidate commit range from `git log`). Collect independent sources in one batch of calls. Ask the user for artifacts they mentioned but didn't paste. Evidence collected here saves the expensive agent's tokens.
 
 ### Step 2 — Dispatch the debugger (diagnosis only)
 
@@ -34,7 +34,7 @@ Relay to the user: root cause, evidence chain, reproduction, and what was ruled 
 
 ### Step 4 — Fix (on approval)
 
-When the user wants the fix, dispatch **debugger** (it holds the diagnosis context) to apply the minimal change that removes the cause plus the regression test that would have caught the bug, and to clean up all temporary instrumentation. Then dispatch **code-reviewer** on the fix — bug fixes written under pressure are prime regression material.
+When the user wants the fix, continue the **same debugger** instance (SendMessage to its ID or name) — a fresh dispatch starts with an empty context and would re-derive the whole diagnosis. If the tool cannot resume a subagent, dispatch a new one with the full diagnosis in the prompt. Ask it to apply the minimal change that removes the cause plus the regression test that would have caught the bug, and to clean up all temporary instrumentation. Then dispatch **code-reviewer** on the fix — bug fixes written under pressure are prime regression material.
 
 ### Escalation
 

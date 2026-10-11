@@ -7,12 +7,15 @@ set -euo pipefail
 #   ./install.sh --target opencode
 #   curl -fsSL https://raw.githubusercontent.com/mbocek/claude-support/main/install.sh | bash -s -- opencode
 #
-# The canonical source lives in src/ with a tool-neutral frontmatter and two
-# tokens ({{GUIDE}}, {{CFG}}). This script renders that source into the layout
-# the chosen assistant expects:
+# The canonical source lives in src/ with a tool-neutral frontmatter and three
+# tokens ({{GUIDE}}, {{CFG}}, {{MEMORY_PROTOCOL}}). This script renders that
+# source into the layout the chosen assistant expects:
 #
-#   claude   -> .claude/{agents,commands,templates,agent-memory/_shared}   guide=CLAUDE.md
+#   claude   -> .claude/{agents,commands,templates}                        guide=CLAUDE.md
 #   opencode -> .opencode/{agents,commands,templates,agent-memory/_shared} guide=AGENTS.md
+#
+# Claude Code injects its own memory instructions into `memory: project` agents,
+# so the shared protocol and the lines pointing at it ship to opencode only.
 #
 # For opencode the agent/command frontmatter is rewritten (name/model/effort
 # dropped, mode + permission derived from the neutral `tools`/`memory` fields).
@@ -129,29 +132,42 @@ fm == 1 {
 fm == 2 { print }
 AWK
 
-# render_file <src> <agent|command|passthrough> <guide> <cfg>
+# render_file <src> <opencode-agent|opencode-command|passthrough> <guide> <cfg> <memory_protocol>
+# An empty <memory_protocol> deletes every line carrying the token.
 render_file() {
-  local src="$1" kind="$2" guide="$3" cfg="$4"
+  local src="$1" kind="$2" guide="$3" cfg="$4" memory_protocol="$5"
+  local memory_sed
+  if [ -n "$memory_protocol" ]; then
+    memory_sed="s#{{MEMORY_PROTOCOL}}#${memory_protocol}#g"
+  else
+    memory_sed="/{{MEMORY_PROTOCOL}}/d"
+  fi
+  substitute_tokens() {
+    sed -e "$memory_sed" -e "s#{{GUIDE}}#${guide}#g" -e "s#{{CFG}}#${cfg}#g"
+  }
   if [ "$kind" = "opencode-agent" ]; then
-    awk -v kind="agent" "$AWK_FM" "$src" | sed -e "s#{{GUIDE}}#${guide}#g" -e "s#{{CFG}}#${cfg}#g"
+    awk -v kind="agent" "$AWK_FM" "$src" | substitute_tokens
   elif [ "$kind" = "opencode-command" ]; then
-    awk -v kind="command" "$AWK_FM" "$src" | sed -e "s#{{GUIDE}}#${guide}#g" -e "s#{{CFG}}#${cfg}#g"
+    awk -v kind="command" "$AWK_FM" "$src" | substitute_tokens
   else
     # passthrough: canonical frontmatter is already the claude format
-    sed -e "s#{{GUIDE}}#${guide}#g" -e "s#{{CFG}}#${cfg}#g" "$src"
+    substitute_tokens < "$src"
   fi
 }
 
 render_target() {
   local target="$1"
-  local base guide cfg
+  local base guide cfg memory_protocol=""
   case "$target" in
     claude)   base=".claude";   guide="CLAUDE.md"; cfg=".claude" ;;
-    opencode) base=".opencode"; guide="AGENTS.md"; cfg=".opencode" ;;
+    opencode) base=".opencode"; guide="AGENTS.md"; cfg=".opencode"
+              memory_protocol="Memory format and rules: \`${cfg}/agent-memory/_shared/protocol.md\` — read it before your first memory write." ;;
   esac
 
   for sub in "${SUBTREES[@]}"; do
     rm -rf "${base:?}/$sub"
+  done
+  for sub in agents commands templates; do
     mkdir -p "$base/$sub"
   done
 
@@ -163,16 +179,19 @@ render_target() {
   fi
 
   for f in "$SRC_ROOT"/agents/*.md; do
-    render_file "$f" "$agent_kind" "$guide" "$cfg" > "$base/agents/$(basename "$f")"
+    render_file "$f" "$agent_kind" "$guide" "$cfg" "$memory_protocol" > "$base/agents/$(basename "$f")"
   done
   for f in "$SRC_ROOT"/commands/*.md; do
-    render_file "$f" "$cmd_kind" "$guide" "$cfg" > "$base/commands/$(basename "$f")"
+    render_file "$f" "$cmd_kind" "$guide" "$cfg" "$memory_protocol" > "$base/commands/$(basename "$f")"
   done
   for f in "$SRC_ROOT"/templates/*.md; do
-    render_file "$f" "passthrough" "$guide" "$cfg" > "$base/templates/$(basename "$f")"
+    render_file "$f" "passthrough" "$guide" "$cfg" "$memory_protocol" > "$base/templates/$(basename "$f")"
   done
-  render_file "$SRC_ROOT/memory/protocol.md" "passthrough" "$guide" "$cfg" \
-    > "$base/agent-memory/_shared/protocol.md"
+  if [ -n "$memory_protocol" ]; then
+    mkdir -p "$base/agent-memory/_shared"
+    render_file "$SRC_ROOT/memory/protocol.md" "passthrough" "$guide" "$cfg" "$memory_protocol" \
+      > "$base/agent-memory/_shared/protocol.md"
+  fi
 
   echo "Rendered '$target' into $(pwd)/$base"
 }

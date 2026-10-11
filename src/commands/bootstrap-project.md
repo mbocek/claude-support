@@ -23,11 +23,11 @@ checklist.
 
 ### Step 1 — Discover the project
 
-Dispatch **scout** to establish the facts the file needs — as parallel scouts in a single message,
-one per independent question: (a) languages, frameworks, and repo layout; (b) build/test/lint/run
-commands (Makefile, package.json scripts, CI config are the best sources); (c) conventions,
-boundaries, generated code, and existing docs stating rules. For a small repo a single scout
-covering all three is fine — but never run them one after another. Every command scout reports must
+Dispatch **scout** to establish the facts the file needs — parallel scouts in one message, one per
+independent question: (a) languages, frameworks, and repo layout; (b) build/test/lint/run commands
+(Makefile, package.json scripts, CI config are the best sources); (c) conventions, boundaries,
+generated code, and existing docs stating rules. For a small repo one scout covering all three is
+enough. Every command scout reports must
 be traceable to a definition in the repo (Makefile target, script entry, CI step)
 — a `{{GUIDE}}` with an invented test command poisons every future agent run.
 
@@ -38,8 +38,8 @@ missing facts; a `{{GUIDE}}` containing only the sections the user confirmed is 
 ### Step 2 — Audit or draft
 
 **If `{{GUIDE}}` exists:** compare it against the template's sections and the scout's findings.
-Produce a gap report: missing sections, stale or wrong claims, and content that belongs elsewhere
-(long prose, duplicated README material). For suspicious commands, dispatch one **scout** with the
+Produce a gap report: missing sections, stale or wrong claims, content that belongs elsewhere
+(long prose, duplicated README material), and length past ~100 lines. For suspicious commands, dispatch one **scout** with the
 full list to confirm each is still defined in the repo's build config — a single batched run, not
 one dispatch per command; do not attempt to execute project build/test commands yourself; existence
 in the config is the verification bar here. Propose concrete edits.
@@ -59,7 +59,7 @@ user reruns without `audit` to apply.
 ### Quality bar
 
 - Every command in the file has been seen in the repo (Makefile, scripts, CI) or confirmed by the user.
-- Short and factual — each line should change how an agent behaves; cut anything derivable from
-  one glance at the codebase.
+- Short and factual — under ~100 lines, because it loads into every session; each line should
+  change how an agent behaves; cut anything derivable from one glance at the codebase.
 - Boundaries section is explicit about what agents must never touch (generated files, migrations,
   secrets), because agents treat silence as permission.

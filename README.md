@@ -24,7 +24,7 @@ Re-running replaces the installed files wholesale; your own files, including sav
 - **Independence, not model tier, is what makes a review worth its cost.** A reviewer arrives with a clean context and an adversarial brief instead of the author's belief that the code is correct. `/feature` therefore hard-wires `security-reviewer` to sensitive surfaces rather than leaving it to self-assessment.
 - **Roles by phase, not by stack.** Stack specifics live in each project's guide file, which every agent reads first — so the same set works in any repo.
 - **The session sets the dial; commands never override it** *(Claude Code only)*. No command pins `model` or `effort`, so `/model` and `/effort` stay the global cost dials. Only agents pin a model — Haiku for mechanical work, Opus for review and root-cause, Fable for escalation.
-- **Effort only where it deviates** *(Claude Code only)*. `effort` in frontmatter overrides the session level, and `high` is already the default on every model that supports effort — so writing it out would only break `/effort`. It is set only where an agent must differ from whatever the session chose. Haiku [does not support effort at all](https://code.claude.com/docs/en/model-config#adjust-effort-level), so Haiku agents carry none.
+- **Effort pinned only where quality must not follow the session** *(Claude Code only)*. `effort` in frontmatter overrides the session level, so every pin takes that agent off the `/effort` dial. The 5.5 models [default to `medium`](https://code.claude.com/docs/en/model-config#adjust-effort-level), so the reviewers pin `high`: a review that silently drops to `medium` is the cheapest place to lose quality. The debugger and the consultant pin `xhigh`; `scout` follows the session.
 - **Cost scales with the change.** `/poc` runs with no agents at all; `/feature` adds tests, e2e, and reviewers — but only the reviewers the diff actually triggers.
 
 Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast lane and `/debug` / `/consult` as escalations.
@@ -35,9 +35,9 @@ Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast 
 
 | Agent | Model / effort | Access | Role |
 |-------|----------------|--------|------|
-| `scout` | haiku / — | read-only | Fast reconnaissance — locates code, maps conventions |
-| `code-reviewer` | opus / *session* | read-only | Verification gate — correctness, concurrency, contracts |
-| `security-reviewer` | opus / *session* | read-only | Adversarial review — injection, authN/Z, secrets, trust boundaries |
+| `scout` | haiku / *session* | read-only | Fast reconnaissance — locates code, maps conventions |
+| `code-reviewer` | opus / high | read-only | Verification gate — correctness, concurrency, contracts |
+| `security-reviewer` | opus / high | read-only | Adversarial review — injection, authN/Z, secrets, trust boundaries |
 | `debugger` | opus / xhigh | write | Root-cause analysis; fixes only on request |
 | `fable-consultant` | fable / xhigh | read-only | Escalation-only second opinion; invoked via `/consult` |
 
@@ -55,7 +55,7 @@ Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast 
 
 ## Targets
 
-The source is authored once with a tool-neutral frontmatter and two tokens — `{{GUIDE}}` (guide file) and `{{CFG}}` (config dir). `install.sh` renders it per target:
+The source is authored once with a tool-neutral frontmatter and three tokens — `{{GUIDE}}` (guide file), `{{CFG}}` (config dir), and `{{MEMORY_PROTOCOL}}` (a line pointing at the shared memory protocol). `install.sh` renders it per target:
 
 | | Claude Code | opencode |
 |---|---|---|
@@ -63,6 +63,7 @@ The source is authored once with a tool-neutral frontmatter and two tokens — `
 | Guide file | `CLAUDE.md` | `AGENTS.md` |
 | Tool access | `tools:` allowlist | `permission:` map (derived) |
 | Per-agent model / effort | applied | dropped (uses opencode default) |
+| Agent-memory protocol | built in (lines dropped) | `agent-memory/_shared/protocol.md` |
 
 For Claude Code the frontmatter is emitted as-is. For opencode the installer drops `name`/`model`/`effort`, adds `mode: subagent`, derives `permission:` from the `tools:` list, and gives commands `agent: build`.
 
@@ -75,11 +76,11 @@ src/
   agents/*.md      # 5 agents, tool-neutral frontmatter
   commands/*.md    # 7 slash commands
   templates/       # guide-file contract template
-  memory/          # shared agent-memory protocol
+  memory/          # agent-memory protocol (opencode only)
 install.sh         # renders src/ into .claude/ or .opencode/
 ```
 
-The guide file (`CLAUDE.md` / `AGENTS.md`) is where each project supplies its stack, commands, conventions, and boundaries — see [`src/templates/project-guide-template.md`](src/templates/project-guide-template.md). Agents with `memory: project` persist durable findings per [`src/memory/protocol.md`](src/memory/protocol.md); enabling memory grants Write/Edit even for read-only roles, so read-only is enforced by the prompt.
+The guide file (`CLAUDE.md` / `AGENTS.md`) is where each project supplies its stack, commands, conventions, and boundaries — see [`src/templates/project-guide-template.md`](src/templates/project-guide-template.md). Agents with `memory: project` persist durable findings — in Claude Code through its built-in agent memory, in opencode per [`src/memory/protocol.md`](src/memory/protocol.md). Enabling memory grants Write/Edit even for read-only roles, so read-only is enforced by the prompt.
 
 ## Manual install
 
