@@ -29,6 +29,8 @@ If it returns **blocked**, the spec did not decide something. Do not resolve it 
 
 Run the spec's acceptance criteria yourself — green means observed green. Send long output to a file and read only the failures. If anything is red, go to step 4 with the failures as the findings.
 
+If the change touches anything a user sees, look at it — nobody else in this pipeline does, and a green build with a clean review says nothing about the screen. Run the app the way the project's `CLAUDE.md` says, drive each changed screen as a user would (open it, switch between records, save, reopen), screenshot it, and read the screenshot next to the reference screen the spec names. Spacing, width, alignment, a control styled unlike its neighbours, or a click that has to be repeated is a finding exactly like a failing test. Re-take the screenshots after every fix round.
+
 ### 3. Review
 
 Dispatch **code-reviewer**: the spec path, the base ref, the changed-file list from `git status --short` (it runs `git diff` itself, which misses untracked new files), and the spec's Review focus. Ask it to check the change against the spec — every step done as specified, nothing out of scope, frozen files untouched — besides its usual review. If the spec lists a sensitive surface or the changed files touch one (auth, secrets, payments, user-controlled input, files and paths, deserialization, outbound calls), dispatch **security-reviewer** in the same message so both run in parallel.
@@ -41,4 +43,4 @@ A finding that shows the spec itself is wrong is not fixed in code: stop and sen
 
 ### 5. Report
 
-One short summary: what was built, the acceptance criteria with real results, the reviewers that ran and their verdicts, files changed, and **Open** — surviving findings, deviations, anything unverified. Do not commit — suggest `/commit`.
+One short summary: what was built, the acceptance criteria with real results, the screenshots you checked (paths), the reviewers that ran and their verdicts, files changed, and **Open** — surviving findings, deviations, anything unverified. Do not commit — suggest `/commit`.

@@ -31,6 +31,8 @@ Where the project has a test framework, write the tests that define "done" yours
 
 Path: `spec-<short-slug>-<YYYY-MM-DD>.md` in the working directory. Every step must be executable without judgment: name exact files and signatures, point at a pattern to copy (`path:line`), and say what "done" means as a runnable command. If a step cannot be specified that tightly, the design is not finished — go back to step 1.
 
+A step that changes what a user sees specifies the layout, not just the contents: which controls share a row, how wide each is, how sections are spaced, and an existing screen it must look like (route or `path:line`). "Add a field for X" leaves the placement to wherever the markup happens to fall, and type checks, tests and a code review all pass on a screen nobody would ship. Give each such screen a visual acceptance criterion the build checks on a screenshot.
+
 ```markdown
 # {Title}
 
@@ -49,6 +51,7 @@ Path: `spec-<short-slug>-<YYYY-MM-DD>.md` in the working directory. Every step m
 ## Acceptance criteria
 - `{command}` passes
 - {any other checkable criterion, phrased so it is pass/fail}
+- {per changed screen: `{route}` — what the screenshot must show, e.g. "X and Y on one row, styled like {reference screen}"}
 
 ## Out of scope
 - {What must not be touched or added.}
@@ -63,7 +66,7 @@ Path: `spec-<short-slug>-<YYYY-MM-DD>.md` in the working directory. Every step m
 
 ### 4. Independent review of the spec
 
-Dispatch `code-reviewer` on the spec, not on code. Brief: *"Review this spec for executability by a cheaper model that implements literally: find every place it would have to guess — ambiguous interface, missing pattern reference, criterion that is not pass/fail, step that silently assumes knowledge of the code, missing stop condition. Check the referenced paths and signatures against the repo. Do not review the design direction; it is agreed."* Fix the spec for each finding yourself; a finding that reopens a user decision goes back to the user.
+Dispatch `code-reviewer` on the spec, not on code. Brief: *"Review this spec for executability by a cheaper model that implements literally: find every place it would have to guess — ambiguous interface, missing pattern reference, criterion that is not pass/fail, step that silently assumes knowledge of the code, missing stop condition, a UI step without a layout or a reference screen. Check the referenced paths and signatures against the repo. Do not review the design direction; it is agreed."* Fix the spec for each finding yourself; a finding that reopens a user decision goes back to the user.
 
 ### 5. Hand off
 
