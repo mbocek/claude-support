@@ -57,6 +57,7 @@ This is what separates `/feature` from `/poc`, so none of it is optional:
 - Cover the new behavior with tests, at the level and in the framework the project already tests at.
 - Run the unit/integration suite, then the e2e suite where the project has one. Commands come from `CLAUDE.md`; discover them if the guide is silent, and say so plainly if the project has none.
 - Iterate on the narrowest tests that cover the change; run the full suites once the change is green. Send long output to a file and read only the failures.
+- **A changed screen is verified by looking at it.** Run the app, drive each screen the change touches as a user would (open, switch records, save), screenshot it and read it next to a similar existing screen. Bad spacing, width or alignment, a control styled unlike its neighbours, or a click that has to be repeated is a failure like a red test — suites and e2e pass on all of them.
 - **Green means observed green.** A suite you did not run is not a passing suite. Report red output verbatim and fix it — never report verification you did not actually perform.
 
 ### 5. Review
