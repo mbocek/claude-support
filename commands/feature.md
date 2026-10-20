@@ -34,7 +34,7 @@ The request arrives in one of three shapes:
 
 ### 2. Plan
 
-Orient yourself first: the files the change touches, the conventions in `{{GUIDE}}`, and any analogous implementation already in the repo. Then write the plan — goal, ordered steps, what could break, and how you will verify it. Keep it yours; it does not need to be shown unless the gate below fires.
+Orient yourself first: the files the change touches, the conventions in `CLAUDE.md`, and any analogous implementation already in the repo. Then write the plan — goal, ordered steps, what could break, and how you will verify it. Keep it yours; it does not need to be shown unless the gate below fires.
 
 **Approval gate — conditional.** Stop and present the plan only when it contains a decision that is genuinely the user's:
 
@@ -55,7 +55,7 @@ Write the code yourself, following the surrounding conventions. Keep the plan ho
 This is what separates `/feature` from `/poc`, so none of it is optional:
 
 - Cover the new behavior with tests, at the level and in the framework the project already tests at.
-- Run the unit/integration suite, then the e2e suite where the project has one. Commands come from `{{GUIDE}}`; discover them if the guide is silent, and say so plainly if the project has none.
+- Run the unit/integration suite, then the e2e suite where the project has one. Commands come from `CLAUDE.md`; discover them if the guide is silent, and say so plainly if the project has none.
 - Iterate on the narrowest tests that cover the change; run the full suites once the change is green. Send long output to a file and read only the failures.
 - **Green means observed green.** A suite you did not run is not a passing suite. Report red output verbatim and fix it — never report verification you did not actually perform.
 

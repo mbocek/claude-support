@@ -1,8 +1,8 @@
-# {{GUIDE}} contract template
+# CLAUDE.md contract template
 
-This template defines the sections a project's `{{GUIDE}}` must provide for the commands and the
+This template defines the sections a project's `CLAUDE.md` must provide for the commands and the
 generic agent set (scout, code-reviewer, security-reviewer, debugger, fable-consultant) to work
-well. They are stack-agnostic by design — this file is where the project supplies the stack. `/bootstrap-project` audits or creates a `{{GUIDE}}` against it.
+well. They are stack-agnostic by design — this file is where the project supplies the stack. `/bootstrap-project` audits or creates a `CLAUDE.md` against it.
 
 Keep the real file short and factual — it loads into every session, so aim for under ~100 lines,
 and every line should change how an agent behaves. Delete any section that does not apply rather
@@ -11,7 +11,7 @@ than leaving placeholder prose.
 ---
 
 ```markdown
-# {{GUIDE}}
+# CLAUDE.md
 
 ## What this is
 
