@@ -18,14 +18,16 @@ From a clone, `bash /path/to/claude-support/install.sh` uses the checked-out fil
 
 ## Design
 
-- **The command does the work; agents are for what it cannot do itself.** `/poc` and `/feature` plan, implement, and verify inline. A subagent is dispatched only where a *separate* context genuinely beats the author's — reconnaissance too broad to hold, or a review that must not be the author's own. That is why the agent set is small.
-- **Independence, not model tier, is what makes a review worth its cost.** A reviewer arrives with a clean context and an adversarial brief instead of the author's belief that the code is correct. `/feature` therefore hard-wires `security-reviewer` to sensitive surfaces rather than leaving it to self-assessment.
+- **The command does the work; agents are for what it cannot do itself.** `/poc` and `/feature` plan, implement, and verify inline. A subagent is dispatched only where a *separate* context genuinely beats the author's — reconnaissance too broad to hold, a review that must not be the author's own, or (in `/build`) bulk implementation on a cheaper model. That is why the agent set is small.
+- **A review needs independence and a reviewer never weaker than the author.** A reviewer arrives with a clean context and an adversarial brief instead of the author's belief that the code is correct; on a weaker model it cannot judge the stronger author's work, so both reviewers run on Opus. `/feature` therefore hard-wires `security-reviewer` to sensitive surfaces rather than leaving it to self-assessment.
 - **Roles by phase, not by stack.** Stack specifics live in each project's `CLAUDE.md`, which every agent reads first — so the same set works in any repo.
-- **The session sets the dial; commands never override it**. No command pins `model` or `effort`, so `/model` and `/effort` stay the global cost dials. Only agents pin a model — Haiku for mechanical work, Opus for review and root-cause, Fable for escalation.
-- **Effort pinned only where quality must not follow the session**. `effort` in frontmatter overrides the session level, so every pin takes that agent off the `/effort` dial. The 5.5 models [default to `medium`](https://code.claude.com/docs/en/model-config#adjust-effort-level), so the reviewers pin `high`: a review that silently drops to `medium` is the cheapest place to lose quality. The debugger and the consultant pin `xhigh`; `scout` follows the session.
-- **Cost scales with the change.** `/poc` runs with no agents at all; `/feature` adds tests, e2e, and reviewers — but only the reviewers the diff actually triggers.
+- **The session sets the dial; only mechanical work overrides it.** `/model` and `/effort` stay the global cost dials: no command pins `effort`, and only `/commit` pins a model (Haiku). A command's `model` holds for one turn only, so it suits single-turn commands; the saving is in output and thinking — on a long session the uncached switch can eat the input side. Agents pin the cheapest model that holds quality — Haiku for reconnaissance, Sonnet for implementing a spec, Opus for review and root-cause, Fable for escalation.
+- **Reading is delegated down.** Broad orientation in `/poc` and `/feature` goes to `scout` on Haiku: the files it sweeps never enter the session's context, which is re-sent on every later turn at the session model's price. The session reads only the files it edits.
+- **Effort pinned only where quality must not follow the session**. `effort` in frontmatter overrides the session level, so every pin takes that agent off the `/effort` dial. The 5.5 models [default to `medium`](https://code.claude.com/docs/en/model-config#adjust-effort-level), so the reviewers pin `high`: a review that silently drops to `medium` is the cheapest place to lose quality. The debugger and the consultant pin `xhigh`; `implementer` pins `medium` — it executes a spec that already holds the thinking; `scout` pins `low`, since locating code gains nothing from deep thinking.
+- **Design on the strong model, execute on the cheap one.** `/spec` settles every decision with the user and writes acceptance tests plus a spec that leaves nothing to judge; `/build` hands it to `implementer` on Sonnet and puts a strong-model review on both ends — the spec before handoff, the diff after. The cheap model never designs: anything the spec does not decide stops the build and goes back to `/spec`. Run `/spec` on Opus or Fable at `/effort high` or above — it is multi-turn, so a command pin would not hold, and the 5.5 default `medium` is too low for design.
+- **Cost scales with the change.** `/poc` dispatches nothing but `scout`; `/feature` adds tests, e2e, and reviewers — but only the reviewers the diff actually triggers.
 
-Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast lane and `/debug` / `/consult` as escalations.
+Typical flow: `/brainstorm` → `/spec` → `/build` → `/commit` for larger work, `/feature` when one model doing it all is cheaper than a spec, `/poc` as a fast lane, and `/debug` / `/consult` as escalations.
 
 ## Agents
 
@@ -34,6 +36,7 @@ Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast 
 | Agent | Model / effort | Access | Role |
 |-------|----------------|--------|------|
 | `scout` | haiku / *session* | read-only | Fast reconnaissance — locates code, maps conventions |
+| `implementer` | sonnet / medium | write | Executes a `/spec` literally; stops on anything the spec does not decide |
 | `code-reviewer` | opus / high | read-only | Verification gate — correctness, concurrency, contracts |
 | `security-reviewer` | opus / high | read-only | Adversarial review — injection, authN/Z, secrets, trust boundaries |
 | `debugger` | opus / xhigh | write | Root-cause analysis; fixes only on request |
@@ -43,19 +46,21 @@ Typical flow: `/brainstorm` → `/feature` → `/commit`, with `/poc` as a fast 
 
 | Command | Description |
 |---------|-------------|
-| `/brainstorm` | Sparring-partner ideation before the "what" is decided; runs inline (`scout` for ground truth, `fable-consultant` for a hard call) and ends in an artifact that feeds `/poc` or `/feature` |
-| `/feature` | The disciplined lane, run inline on the session model: plan → **conditional approval gate** → implement → tests and e2e → review → fix loop → docs. Dispatches `security-reviewer` (mandatory on sensitive surfaces) and `code-reviewer` (large or contract-changing diffs); otherwise reviews its own diff. Accepts a `/brainstorm` or `/poc` handoff |
-| `/poc` | Fast lane to a minimal working prototype — built inline with no subagents, no tests, no review; hands off to `/feature` to harden |
+| `/brainstorm` | Sparring-partner ideation before the "what" is decided; runs inline (`scout` for ground truth, `fable-consultant` for a hard call) and ends in an artifact that feeds `/poc`, `/feature`, or `/spec` |
+| `/spec` | Design with the user on the session model → acceptance tests → spec → independent review of the spec for executability. Accepts a `/brainstorm` artifact |
+| `/build` | Runs a spec on `implementer`, verifies the acceptance criteria, Opus review against the spec (+ `security-reviewer` on sensitive surfaces), fix loop of at most 2 rounds |
+| `/feature` | The disciplined lane, run inline on the session model: plan → **conditional approval gate** → implement → tests and e2e → review → fix loop → docs. Dispatches `scout` for broad orientation, `security-reviewer` (mandatory on sensitive surfaces) and `code-reviewer` (large or contract-changing diffs); otherwise reviews its own diff. Accepts a `/brainstorm` or `/poc` handoff |
+| `/poc` | Fast lane to a minimal working prototype — built inline (`scout` only for broad recon), no tests, no review; hands off to `/feature` to harden |
 | `/debug` | Structured debugging: reproduce → hypothesize → bisect → root cause; fix only on approval |
 | `/consult` | Escalation to `fable-consultant` with an enforced briefing protocol |
 | `/bootstrap-project` | Audits or creates the project's `CLAUDE.md` from the contract template |
-| `/commit` | Git commit following [commitizen](https://commitizen-tools.github.io/commitizen/) conventions, with no AI attribution |
+| `/commit` | Git commit following [commitizen](https://commitizen-tools.github.io/commitizen/) conventions, with no AI attribution; runs on Haiku |
 
 ## Layout
 
 ```
-agents/*.md      # 5 agents
-commands/*.md    # 7 slash commands
+agents/*.md      # 6 agents
+commands/*.md    # 9 slash commands
 templates/       # CLAUDE.md contract template
 install.sh       # copies the three directories into .claude/
 ```

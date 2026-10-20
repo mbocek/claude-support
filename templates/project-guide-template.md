@@ -1,7 +1,7 @@
 # CLAUDE.md contract template
 
 This template defines the sections a project's `CLAUDE.md` must provide for the commands and the
-generic agent set (scout, code-reviewer, security-reviewer, debugger, fable-consultant) to work
+generic agent set (scout, implementer, code-reviewer, security-reviewer, debugger, fable-consultant) to work
 well. They are stack-agnostic by design — this file is where the project supplies the stack. `/bootstrap-project` audits or creates a `CLAUDE.md` against it.
 
 Keep the real file short and factual — it loads into every session, so aim for under ~100 lines,

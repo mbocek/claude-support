@@ -91,7 +91,7 @@ Either way, bring the counter-arguments back to the user; don't silently absorb 
 
 **Language policy.** The artifact body and section headings should be in the user's language (matches the session). Frontmatter, fenced code blocks, command names (`/feature`, `/commit`), and agent names stay as-is.
 
-The artifact has a second job: **it is the input for the build step — either `/poc` or `/feature`.** Write "Core direction", "Assumptions", and "Open questions" so that the next command can start from decisions, not re-derive them — decided means decided, open means explicitly open. `/feature` reads the whole contract and settles the open questions in its plan; `/poc` reads just the core direction to prototype fast and leaves the open questions for the later `/feature` pass.
+The artifact has a second job: **it is the input for the build step — `/poc`, `/feature`, or `/spec`.** Write "Core direction", "Assumptions", and "Open questions" so that the next command can start from decisions, not re-derive them — decided means decided, open means explicitly open. `/feature` reads the whole contract and settles the open questions in its plan; `/poc` reads just the core direction to prototype fast and leaves the open questions for the later `/feature` pass.
 
 When the user signals done:
 
@@ -129,7 +129,7 @@ _Language: {user's language} · Mode: {converge|map}_
 - {Unresolved items — /feature must settle each one in its plan or escalate it at the gate, never silently decide it.}
 
 ## Next steps
-- {Concrete short list. When the direction is buildable, the first step is a build command with this artifact as input: `/poc <artifact>` to derisk a fresh or uncertain direction with a fast prototype first, or `/feature <artifact>` to build it properly in one pass. Point to /consult if a hard decision remained open.}
+- {Concrete short list. When the direction is buildable, the first step is a build command with this artifact as input: `/poc <artifact>` to derisk a fresh or uncertain direction with a fast prototype first, `/feature <artifact>` to build it properly in one pass, or `/spec <artifact>` to design it with the strong model and hand execution to a cheaper one. Point to /consult if a hard decision remained open.}
 
 ## Outside input
 {Only when `scout` or `fable-consultant` was consulted — one line each on what it contributed. Delete the section otherwise.}

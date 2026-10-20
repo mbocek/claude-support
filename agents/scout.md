@@ -6,6 +6,7 @@ description: >
   pattern is used, what conventions the codebase follows, who calls what.
 tools: Read, Grep, Glob, Bash
 model: haiku
+effort: low
 color: cyan
 ---
 

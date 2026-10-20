@@ -1,6 +1,7 @@
 ---
 allowed-tools: Bash(git:*), Bash(cat:*), Bash(echo:*), AskUserQuestion
 description: Create a git commit following project conventions
+model: haiku
 ---
 
 ## Context
@@ -27,7 +28,7 @@ Based on the above changes, create a single git commit.
 
 1. Read the diff of the files that matter (`git diff [--cached] -- <path>`) to determine the correct type and scope — the stats above are only the index
 2. Write a concise commit message (1-2 lines) that focuses on the "why" not the "what"
-3. **Show the proposed commit message to the user** and ask if they want to proceed, edit it, or cancel
+3. **Show the proposed commit message to the user** and ask with AskUserQuestion whether to proceed, edit it, or cancel — a typed reply would end this turn and drop the Haiku pin
 4. Wait for user confirmation — only then stage the relevant files and create the commit
 
 Use a HEREDOC for the commit message to preserve formatting:

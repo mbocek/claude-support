@@ -13,7 +13,7 @@ description: End-to-end feature work done inline — plan → implement → test
 
 ## Your task
 
-Take the request to a finished, verified change **yourself, in this session**. You plan, you implement, you run the tests. The only subagents you may dispatch are `code-reviewer` and `security-reviewer`, per the triggers in step 5.
+Take the request to a finished, verified change **yourself, in this session**. You plan, you implement, you run the tests. The only subagents you may dispatch are `scout` for broad orientation (step 2) and `code-reviewer` and `security-reviewer`, per the triggers in step 5.
 
 If `$ARGUMENTS` is empty, ask what to build before doing anything else.
 
@@ -34,7 +34,7 @@ The request arrives in one of three shapes:
 
 ### 2. Plan
 
-Orient yourself first: the files the change touches, the conventions in `CLAUDE.md`, and any analogous implementation already in the repo. Then write the plan — goal, ordered steps, what could break, and how you will verify it. Keep it yours; it does not need to be shown unless the gate below fires.
+Orient yourself first: the files the change touches, the conventions in `CLAUDE.md`, and any analogous implementation already in the repo. When that means sweeping more than a handful of files or an unfamiliar module, dispatch `scout` with concrete questions instead of reading it all here — it reads on a far cheaper model and only its map enters this context. Read yourself only the files you will edit. Then write the plan — goal, ordered steps, what could break, and how you will verify it. Keep it yours; it does not need to be shown unless the gate below fires.
 
 **Approval gate — conditional.** Stop and present the plan only when it contains a decision that is genuinely the user's:
 

@@ -1,7 +1,7 @@
 ---
-allowed-tools: Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion
+allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Agent, AskUserQuestion
 argument-hint: [what to prototype | brainstorm-*.md]
-description: Fast lane to a minimal working prototype — built inline, no subagents, no tests; hands off to /feature
+description: Fast lane to a minimal working prototype — built inline, no review subagents, no tests; hands off to /feature
 ---
 
 ## Context
@@ -13,7 +13,7 @@ description: Fast lane to a minimal working prototype — built inline, no subag
 
 ## Your task
 
-Build a **minimal working version** of the request yourself, in this session, then stop. You do the recon and you write the code — **no subagents**. No tests, no review, no commit: that discipline lives in `/feature`, which the user runs next.
+Build a **minimal working version** of the request yourself, in this session, then stop. You write the code — the only subagent allowed is `scout`, for recon too broad to read here. No tests, no review, no commit: that discipline lives in `/feature`, which the user runs next.
 
 If `$ARGUMENTS` is empty, ask what to prototype before doing anything else.
 
@@ -23,7 +23,7 @@ If `$ARGUMENTS` names a `brainstorm-*.md` file (or one in the working directory 
 
 ### Build
 
-Orient only as far as you need — the files the change touches and the conventions to follow. Then implement, directly in the working tree on the current branch: no branch, no worktree, no isolation.
+Orient only as far as you need — the files the change touches and the conventions to follow. When that means sweeping more than a handful of files or an unfamiliar module, dispatch one `scout` with concrete questions instead of reading it all here; read yourself only the files you will edit. Then implement, directly in the working tree on the current branch: no branch, no worktree, no isolation.
 
 The contract:
 
@@ -49,6 +49,6 @@ Then stop, and tell the user to run `/feature` next: the PoC in the working tree
 
 ### Rules
 
-- Never dispatch a subagent from `/poc` — the whole point is one fast inline pass.
+- Never dispatch anything but `scout` from `/poc` — the whole point is one fast inline pass.
 - Report failures verbatim — if the PoC does not run, say so; never present a broken prototype as working.
 - Never slide into full-feature mode: no tests, no review, no commit here. That is `/feature`'s job.
